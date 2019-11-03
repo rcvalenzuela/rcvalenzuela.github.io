@@ -1,13 +1,24 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   
   <url>
-    <loc>https://rcvalenzuela.github.io/categories/</loc>
+    <loc>https://rcvalenzuela.github.io/</loc>
+    <lastmod>2019-11-03T14:18:40+01:00</lastmod>
   </url>
   
   <url>
-    <loc>https://rcvalenzuela.github.io/</loc>
+    <loc>https://rcvalenzuela.github.io/pages/</loc>
+    <lastmod>2019-11-03T14:18:40+01:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://rcvalenzuela.github.io/pages/resources/</loc>
+    <lastmod>2019-11-03T14:18:40+01:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://rcvalenzuela.github.io/categories/</loc>
   </url>
   
   <url>
