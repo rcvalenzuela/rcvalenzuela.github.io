@@ -6,7 +6,7 @@
     <description>Recent content in Pages on </description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Sun, 03 Nov 2019 14:18:40 +0100</lastBuildDate>
+    <lastBuildDate>Mon, 04 Nov 2019 01:15:40 +0100</lastBuildDate>
     
 	<atom:link href="https://rcvalenzuela.github.io/pages/index.xml" rel="self" type="application/rss+xml" />
     
@@ -14,10 +14,10 @@
     <item>
       <title>Resources</title>
       <link>https://rcvalenzuela.github.io/pages/resources/</link>
-      <pubDate>Sun, 03 Nov 2019 14:18:40 +0100</pubDate>
+      <pubDate>Mon, 04 Nov 2019 01:15:40 +0100</pubDate>
       
       <guid>https://rcvalenzuela.github.io/pages/resources/</guid>
-      <description> Talks  Beyond empirical risk minimization: the lessons of deep learning. Talk given by Mikhail Belkin at the Center for Brains, Minds and machines on October 2019  </description>
+      <description> Talks  Beyond empirical risk minimization: the lessons of deep learning. Talk given by Mikhail Belkin at the Center for Brains, Minds and machines on October 2019  Books Online  A course in Machine learning. Hal Daumé III The Elements of Statistical Learning. Trevor Hastie, Robert Tibshirani and Jerome Friedman Python Data Science Handbook. Jake VanderPlas  </description>
     </item>
     
   </channel>
