@@ -6,10 +6,19 @@
     <description>Recent content in Pages on </description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Mon, 04 Nov 2019 01:15:40 +0100</lastBuildDate>
+    <lastBuildDate>Sun, 17 Nov 2019 08:00:00 +0200</lastBuildDate>
     
 	<atom:link href="https://rcvalenzuela.github.io/pages/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>About</title>
+      <link>https://rcvalenzuela.github.io/pages/about/</link>
+      <pubDate>Sun, 17 Nov 2019 08:00:00 +0200</pubDate>
+      
+      <guid>https://rcvalenzuela.github.io/pages/about/</guid>
+      <description>I have set up this blog as a personal repository of things that I find interesting, of tips and tricks that I somewhat have had to use and of some of the personal problems that I have solved in the past.</description>
+    </item>
     
     <item>
       <title>Resources</title>
