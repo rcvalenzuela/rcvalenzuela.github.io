@@ -6,9 +6,19 @@
     <description>Recent content in Tags on </description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
+    <lastBuildDate>Mon, 04 Nov 2019 01:15:40 +0100</lastBuildDate>
     
 	<atom:link href="https://rcvalenzuela.github.io/tags/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>page</title>
+      <link>https://rcvalenzuela.github.io/tags/page/</link>
+      <pubDate>Mon, 04 Nov 2019 01:15:40 +0100</pubDate>
+      
+      <guid>https://rcvalenzuela.github.io/tags/page/</guid>
+      <description></description>
+    </item>
     
   </channel>
 </rss>

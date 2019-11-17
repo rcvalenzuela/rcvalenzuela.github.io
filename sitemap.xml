@@ -8,6 +8,11 @@
   </url>
   
   <url>
+    <loc>https://rcvalenzuela.github.io/tags/page/</loc>
+    <lastmod>2019-11-04T01:15:40+01:00</lastmod>
+  </url>
+  
+  <url>
     <loc>https://rcvalenzuela.github.io/pages/</loc>
     <lastmod>2019-11-04T01:15:40+01:00</lastmod>
   </url>
@@ -18,11 +23,12 @@
   </url>
   
   <url>
-    <loc>https://rcvalenzuela.github.io/categories/</loc>
+    <loc>https://rcvalenzuela.github.io/tags/</loc>
+    <lastmod>2019-11-04T01:15:40+01:00</lastmod>
   </url>
   
   <url>
-    <loc>https://rcvalenzuela.github.io/tags/</loc>
+    <loc>https://rcvalenzuela.github.io/categories/</loc>
   </url>
   
 </urlset>
