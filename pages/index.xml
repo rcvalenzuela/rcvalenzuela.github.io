@@ -6,10 +6,19 @@
     <description>Recent content in Pages on </description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Sun, 17 Nov 2019 08:00:00 +0200</lastBuildDate>
+    <lastBuildDate>Mon, 06 Apr 2020 01:15:40 +0100</lastBuildDate>
     
 	<atom:link href="https://rcvalenzuela.github.io/pages/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Resources</title>
+      <link>https://rcvalenzuela.github.io/pages/resources/</link>
+      <pubDate>Mon, 06 Apr 2020 01:15:40 +0100</pubDate>
+      
+      <guid>https://rcvalenzuela.github.io/pages/resources/</guid>
+      <description>Talks  Beyond empirical risk minimization: the lessons of deep learning. Talk given by Mikhail Belkin at the Center for Brains, Minds and machines on October 2019  Blog Posts  Installing Python packages from a Jupyter notebook. Jake VanderPlas MLOps Google Cloud  Course Lectures  Statistical Rethinking Winter 2018-2019. Richard McElreath  Books Online  Convex Optimization. Stephen Boyd and Lieven Vandenberghe. A course in Machine learning. Hal Daumé III The Elements of Statistical Learning.</description>
+    </item>
     
     <item>
       <title>About</title>
@@ -18,15 +27,6 @@
       
       <guid>https://rcvalenzuela.github.io/pages/about/</guid>
       <description>I have set up this blog as a personal repository of things that I find interesting, of tips and tricks that I somewhat have had to use and of some of the personal problems that I have solved in the past.</description>
-    </item>
-    
-    <item>
-      <title>Resources</title>
-      <link>https://rcvalenzuela.github.io/pages/resources/</link>
-      <pubDate>Mon, 04 Nov 2019 01:15:40 +0100</pubDate>
-      
-      <guid>https://rcvalenzuela.github.io/pages/resources/</guid>
-      <description>Talks  Beyond empirical risk minimization: the lessons of deep learning. Talk given by Mikhail Belkin at the Center for Brains, Minds and machines on October 2019  Blog Posts  Installing Python packages from a Jupyter notebook. Jake VanderPlas MLOps Google Cloud  Course Lectures  Statistical Rethinking Winter 2018-2019. Richard McElreath  Books Online  Convex Optimization. Stephen Boyd and Lieven Vandenberghe. A course in Machine learning. Hal Daumé III The Elements of Statistical Learning.</description>
     </item>
     
   </channel>
