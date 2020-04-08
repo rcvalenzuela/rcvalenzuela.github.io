@@ -3,6 +3,26 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   
   <url>
+    <loc>https://rcvalenzuela.github.io/posts/create-local-conda-pkg/</loc>
+    <lastmod>2020-04-08T21:30:12+02:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://rcvalenzuela.github.io/tags/post/</loc>
+    <lastmod>2020-04-08T21:30:12+02:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://rcvalenzuela.github.io/posts/</loc>
+    <lastmod>2020-04-08T21:30:12+02:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://rcvalenzuela.github.io/tags/</loc>
+    <lastmod>2020-04-08T21:30:12+02:00</lastmod>
+  </url>
+  
+  <url>
     <loc>https://rcvalenzuela.github.io/</loc>
     <lastmod>2020-04-06T01:15:40+01:00</lastmod>
   </url>
@@ -13,22 +33,12 @@
   </url>
   
   <url>
-    <loc>https://rcvalenzuela.github.io/pages/</loc>
+    <loc>https://rcvalenzuela.github.io/resources/</loc>
     <lastmod>2020-04-06T01:15:40+01:00</lastmod>
   </url>
   
   <url>
-    <loc>https://rcvalenzuela.github.io/pages/resources/</loc>
-    <lastmod>2020-04-06T01:15:40+01:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://rcvalenzuela.github.io/tags/</loc>
-    <lastmod>2020-04-06T01:15:40+01:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://rcvalenzuela.github.io/pages/about/</loc>
+    <loc>https://rcvalenzuela.github.io/about/</loc>
     <lastmod>2019-11-17T08:00:00+02:00</lastmod>
   </url>
   

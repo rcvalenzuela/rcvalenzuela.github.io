@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>post on </title>
+    <link>https://rcvalenzuela.github.io/tags/post/</link>
+    <description>Recent content in post on </description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Wed, 08 Apr 2020 21:30:12 +0200</lastBuildDate>
+    
+	<atom:link href="https://rcvalenzuela.github.io/tags/post/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Building local conda package</title>
+      <link>https://rcvalenzuela.github.io/posts/create-local-conda-pkg/</link>
+      <pubDate>Wed, 08 Apr 2020 21:30:12 +0200</pubDate>
+      
+      <guid>https://rcvalenzuela.github.io/posts/create-local-conda-pkg/</guid>
+      <description>The process  Create the build files: meta.yaml, build.sh, build.bat. These files could be located inside a conda directory in the same directory as the setup.py file  Questions What is a conda recipe?
+References  Packaging Python projects  </description>
+    </item>
+    
+  </channel>
+</rss>

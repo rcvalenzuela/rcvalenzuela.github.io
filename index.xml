@@ -12,20 +12,30 @@
     
     
     <item>
+      <title>Building local conda package</title>
+      <link>https://rcvalenzuela.github.io/posts/create-local-conda-pkg/</link>
+      <pubDate>Wed, 08 Apr 2020 21:30:12 +0200</pubDate>
+      
+      <guid>https://rcvalenzuela.github.io/posts/create-local-conda-pkg/</guid>
+      <description>The process  Create the build files: meta.yaml, build.sh, build.bat. These files could be located inside a conda directory in the same directory as the setup.py file  Questions What is a conda recipe?
+References  Packaging Python projects  </description>
+    </item>
+    
+    <item>
       <title>Resources</title>
-      <link>https://rcvalenzuela.github.io/pages/resources/</link>
+      <link>https://rcvalenzuela.github.io/resources/</link>
       <pubDate>Mon, 06 Apr 2020 01:15:40 +0100</pubDate>
       
-      <guid>https://rcvalenzuela.github.io/pages/resources/</guid>
+      <guid>https://rcvalenzuela.github.io/resources/</guid>
       <description>Talks  Beyond empirical risk minimization: the lessons of deep learning. Talk given by Mikhail Belkin at the Center for Brains, Minds and machines on October 2019  Blog Posts  Installing Python packages from a Jupyter notebook. Jake VanderPlas MLOps Google Cloud  Course Lectures  Statistical Rethinking Winter 2018-2019. Richard McElreath  Books Online  Convex Optimization. Stephen Boyd and Lieven Vandenberghe. A course in Machine learning. Hal Daumé III The Elements of Statistical Learning.</description>
     </item>
     
     <item>
       <title>About</title>
-      <link>https://rcvalenzuela.github.io/pages/about/</link>
+      <link>https://rcvalenzuela.github.io/about/</link>
       <pubDate>Sun, 17 Nov 2019 08:00:00 +0200</pubDate>
       
-      <guid>https://rcvalenzuela.github.io/pages/about/</guid>
+      <guid>https://rcvalenzuela.github.io/about/</guid>
       <description>I have set up this blog as a personal repository of things that I find interesting, of tips and tricks that I somewhat have had to use and of some of the personal problems that I have solved in the past.</description>
     </item>
     
