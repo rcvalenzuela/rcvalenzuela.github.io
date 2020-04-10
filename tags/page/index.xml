@@ -6,19 +6,10 @@
     <description>Recent content in page on </description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Mon, 06 Apr 2020 01:15:40 +0100</lastBuildDate>
+    <lastBuildDate>Sun, 17 Nov 2019 08:00:00 +0200</lastBuildDate>
     
 	<atom:link href="https://rcvalenzuela.github.io/tags/page/index.xml" rel="self" type="application/rss+xml" />
     
-    
-    <item>
-      <title>Resources</title>
-      <link>https://rcvalenzuela.github.io/resources/</link>
-      <pubDate>Mon, 06 Apr 2020 01:15:40 +0100</pubDate>
-      
-      <guid>https://rcvalenzuela.github.io/resources/</guid>
-      <description>Talks  Beyond empirical risk minimization: the lessons of deep learning. Talk given by Mikhail Belkin at the Center for Brains, Minds and machines on October 2019  Blog Posts  Installing Python packages from a Jupyter notebook. Jake VanderPlas MLOps Google Cloud  Course Lectures  Statistical Rethinking Winter 2018-2019. Richard McElreath Deep Learning. CS230 Fall 2018. Andrew Ng  Books Online  Convex Optimization. Stephen Boyd and Lieven Vandenberghe.</description>
-    </item>
     
     <item>
       <title>About</title>
