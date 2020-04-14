@@ -12,13 +12,12 @@
     
     
     <item>
-      <title>Building local conda package</title>
+      <title>Building a local conda package</title>
       <link>https://rcvalenzuela.github.io/posts/create-local-conda-pkg/</link>
       <pubDate>Wed, 08 Apr 2020 21:30:12 +0200</pubDate>
       
       <guid>https://rcvalenzuela.github.io/posts/create-local-conda-pkg/</guid>
-      <description>The process  Create the build files: meta.yaml, build.sh, build.bat. These files could be located inside a conda directory in the same directory as the setup.py file  Questions What is a conda recipe?
-References  Packaging Python projects  </description>
+      <description>The process  Create the build files: meta.yaml, build.sh, build.bat. These files could be located inside a conda directory in the same directory as the setup.py file In the meta.yaml file the spurce/path parameter must be set to the relative path of the setup.py file. If working in an environment different than root the location of the created package must be in the colda-bld directory of the environment and conda install may fail because it does not have the appropriate channel.</description>
     </item>
     
     <item>
@@ -27,7 +26,7 @@ References  Packaging Python projects  </description>
       <pubDate>Mon, 06 Apr 2020 01:15:40 +0100</pubDate>
       
       <guid>https://rcvalenzuela.github.io/resources/</guid>
-      <description>Talks  Beyond empirical risk minimization: the lessons of deep learning. Talk given by Mikhail Belkin at the Center for Brains, Minds and machines on October 2019  Blog Posts  Installing Python packages from a Jupyter notebook. Jake VanderPlas MLOps Google Cloud  Course Lectures  Concepts of Probability Spring 2020 (website). Berkeley STAT134 Probability and Random Processes Berkeley EECS126 (website) Statistical Rethinking Winter 2018-2019. Richard McElreath Foundations of Data Science (website).</description>
+      <description>Talks  Beyond empirical risk minimization: the lessons of deep learning. Talk given by Mikhail Belkin at the Center for Brains, Minds and machines on October 2019  Blogs  Depth first Learning Lilian Weng  Blog Posts  Installing Python packages from a Jupyter notebook. Jake VanderPlas MLOps Google Cloud  Causal Analysis  Pearl&amp;rsquo;s Causal Ladder  Podcasts  Twiml AI Podcast  Webpages People  Peter Norvig  Institutions/Labs  The Alan Turing Institute Publications FastAI  Magazines &amp;amp; Newsletters  Harvard Data Science Review MIT Technology Review  Course Lectures Probability  Concepts of Probability Spring 2020 (website).</description>
     </item>
     
     <item>

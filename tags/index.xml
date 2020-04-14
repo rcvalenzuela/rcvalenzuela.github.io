@@ -12,11 +12,20 @@
     
     
     <item>
-      <title>post</title>
-      <link>https://rcvalenzuela.github.io/tags/post/</link>
+      <title>conda</title>
+      <link>https://rcvalenzuela.github.io/tags/conda/</link>
       <pubDate>Wed, 08 Apr 2020 21:30:12 +0200</pubDate>
       
-      <guid>https://rcvalenzuela.github.io/tags/post/</guid>
+      <guid>https://rcvalenzuela.github.io/tags/conda/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>python</title>
+      <link>https://rcvalenzuela.github.io/tags/python/</link>
+      <pubDate>Wed, 08 Apr 2020 21:30:12 +0200</pubDate>
+      
+      <guid>https://rcvalenzuela.github.io/tags/python/</guid>
       <description></description>
     </item>
     

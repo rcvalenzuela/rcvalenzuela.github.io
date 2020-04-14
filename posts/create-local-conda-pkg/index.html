@@ -7,7 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="format-detection" content="telephone=no"/>
 
-    <title>Building local conda package | </title>
+    <title>Building a local conda package | </title>
     
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
@@ -115,7 +115,7 @@
 </nav>
         <div id="content" class="content-container">
         
-<h1 class="post-title">Building local conda package</h1>
+<h1 class="post-title">Building a local conda package</h1>
     
     <time>April 8, 2020</time>
     
@@ -125,12 +125,18 @@
 <ol>
 <li>Create the build files: meta.yaml, build.sh, build.bat. These files could be
 located inside a conda directory in the same directory as the setup.py file</li>
+<li>In the meta.yaml file the spurce/path parameter must be set to the relative path of the setup.py file.</li>
+<li>If working in an environment different than root the location of the created package must be in the colda-bld directory of the environment and conda install may fail because it does not have the appropriate channel. In that case, the command:
+<pre><code>conda install -c ${CONDA_PREFIX}/conda-bld/ my_package
+</code></pre><p>might do the trick.</p>
+</li>
 </ol>
 <h2 id="questions">Questions</h2>
 <p>What is a conda recipe?</p>
 <h2 id="references">References</h2>
 <ol>
 <li><a href="https://packaging.python.org/tutorials/packaging-projects/">Packaging Python projects</a></li>
+<li><a href="https://docs.conda.io/projects/conda-build/en/latest/user-guide/tutorials/build-pkgs.html#">Building Conda packages from scratch</a></li>
 </ol>
 
         </p>
@@ -141,7 +147,9 @@ located inside a conda directory in the same directory as the setup.py file</li>
         
         <hr class="footer-divider">
         
-            <a class="tag" href="/tags/post">#post</a>
+            <a class="tag" href="/tags/python">#python</a>
+        
+            <a class="tag" href="/tags/conda">#conda</a>
         
       
     </div>
