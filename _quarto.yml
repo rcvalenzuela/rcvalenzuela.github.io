@@ -2,7 +2,7 @@ project:
   type: website
 
 website:
-  title: "rcvalenzuela.github.io"
+  title: "Rene Valenzuela"
   navbar:
     left:
       - href: index.qmd

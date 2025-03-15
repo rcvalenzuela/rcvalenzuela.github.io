@@ -1,7 +1,18 @@
 ---
 title: "Rene Valenzuela"
+toc: false
+about:
+  template: jolla
+  image: media/marblecaves.jpg
+  image-shape: round
+  image-width: 17em
+  links:
+    - icon: twitter
+      text: twitter
+      href: https://twitter.com
+    - icon: github
+      text: Github
+      href: https://github.com
 ---
 
-This is a Quarto website.
-
-To learn more about Quarto websites visit <https://quarto.org/docs/websites>.
+Hi there! I'm René a data scientist with a passion for teaching and exploring new things
