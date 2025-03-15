@@ -1,0 +1,69 @@
+---
+title: "Exploratory data analysis of time series data"
+author: "Rene Valenzuela"
+date: "2023-05-21"
+date-modified: last-modified
+categories: [eda, time-series]
+image: "image.jpg"
+draft: true
+---
+
+We will use the dataset available [here](https://archive.ics.uci.edu/ml/datasets/AI4I+2020+Predictive+Maintenance+Dataset)
+
+## Load the dataset
+
+```{python}
+import pandas as pd
+import yaml
+import matplotlib.pyplot as plt
+import seaborn as sns
+#from ydata_profiling import ProfileReport
+```
+
+```{python}
+with open("predictive_maintenance.yaml", "r") as stream:
+    try:
+        df_meta = yaml.safe_load(stream)
+    except yaml.YAMLError as exc:
+        print(exc)
+```
+
+```{python}
+df = pd.read_parquet('./data/ai4i2020.parquet')
+```
+
+## Rotational speed
+
+```{python}
+import matplotlib.font_manager as font_manager
+
+# Add every font at the specified location
+font_dir = ['./assets/Roboto_Condensed']
+for font in font_manager.findSystemFonts(font_dir):
+    font_manager.fontManager.addfont(font)
+```
+
+```{python}
+# Set font family globally
+from matplotlib import rcParams
+rcParams['axes.spines.top'] = False
+rcParams['axes.spines.right'] = False
+rcParams['font.family'] = 'Roboto Condensed Light'
+```
+
+```{python}
+# Create the figure
+fig, ax = plt.subplots(1, 1, figsize=(8, 4))
+sns.histplot(data=df, x="rot_speed", bins=40, ax=ax)
+ax.set_xlabel(df_meta['features']['rot_speed']['name'])
+fig.tight_layout()
+
+```
+
+```{python}
+#profile = ProfileReport(df, title="Profiling Report")
+```
+
+```{python}
+#profile.to_file("eda_profile_report.html")
+```

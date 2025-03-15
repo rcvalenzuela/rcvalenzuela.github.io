@@ -1,0 +1,96 @@
+---
+title: "Causal discovery in churn data"
+author: "René Valenzuela"
+date: "2024-06-11"
+date-modified: last-modified
+categories: [causal discovery, churn]
+draft: true
+---
+
+```{python}
+import numpy as np
+import pandas as pd
+
+# Visualization using pydot
+#from causallearn.search.ScoreBased.GES import ges
+#from causallearn.utils.GraphUtils import GraphUtils
+import matplotlib.image as mpimg
+import matplotlib.pyplot as plt
+import io
+
+```
+
+```{python}
+abt = pd.read_csv('./online_retail_customer_churn.csv')
+abt_num = abt.copy()
+```
+
+```{python}
+# Gender
+abt_num['Gender'] = abt_num.Gender.map({'Male':1, 'Female': 0, 'Other': -1})
+abt_num['Email_Opt_In'] = abt_num.Email_Opt_In.map({True:1, False: 0})
+abt_num['Promotion_Response'] = abt_num.Promotion_Response.map({'Responded':1, 'Ignored': 0, 'Unsubscribed': -1})
+abt_num['Target_Churn'] = abt_num.Target_Churn.map({True:1, False: 0})
+```
+
+```{python}
+
+# default parameters
+#Record = ges(abt_num.values)
+
+#pyd = GraphUtils.to_pydot(Record['G'])
+#tmp_png = pyd.create_png(f="png")
+#fp = io.BytesIO(tmp_png)
+#img = mpimg.imread(fp, format='png')
+#plt.axis('off')
+#plt.imshow(img)
+#plt.show()
+
+
+# or save the graph
+#pyd.write_png('simple_test.png')
+```
+
+## Linear model with two dependent variables
+
+```{python}
+#rng = np.random.default_rng()
+
+#lin2 = pd.DataFrame({'x1':rng.random(100), 'x2':rng.random(100)})
+#lin2['y'] = lin2['x1'] + lin2['x2']
+```
+
+```{python}
+# default parameters
+#record_lin2 = ges(lin2.values)
+
+#pyd_lin2 = GraphUtils.to_pydot(record_lin2['G'])
+#tmp_png = pyd_lin2.create_png(f="png")
+#fp = io.BytesIO(tmp_png)
+#img = mpimg.imread(fp, format='png')
+#plt.axis('off')
+#plt.imshow(img)
+#plt.show()
+```
+
+## Linear hierarchical model with four variables
+
+```{python}
+#rng = np.random.default_rng()
+
+#linh3 = pd.DataFrame({'x1':rng.random(100), 'x2':rng.random(100)})
+#linh3['x3'] = linh3['x2'] + 0.1*rng.random(100)
+#linh3['y'] = linh3['x1'] + linh3['x3']
+```
+
+```{python}
+# default parameters
+#record_linh3 = ges(linh3.values)
+
+#pyd_linh3 = GraphUtils.to_pydot(record_linh3['G'])
+#tmp_png = pyd_linh3.create_png(f="png")
+#fp = io.BytesIO(tmp_png)
+#img = mpimg.imread(fp, format='png')
+#plt.axis('off')
+#plt.imshow(img)
+#plt.show()

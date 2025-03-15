@@ -1,0 +1,58 @@
+---
+title: "Resources for building a Python package"
+author: "René Valenzuela"
+date: "2023-07-19"
+date-modified: last-modified
+categories: [python]
+draft: true
+---
+
+# Tutorials on how to build a Python package
+
+1. [Packaging Python projects](https://packaging.python.org/en/latest/tutorials/packaging-projects/) Tutorial from the Python packaging authority that walks you through how to package a simple python project
+2. [Python packages](https://py-pkgs.org/) Open source book by Tomas Beuzen & Tiffany Timbers that describes modern and efficient workflows for creating python packages
+
+# Questions
+
+## Which backend should I use for building the package?
+
+Following the guidelines described [here](https://drivendata.co/blog/python-packaging-2023) the main requirement for the backend is that it is [PEP517](https://peps.python.org/pep-0517/) and [PEP621](https://peps.python.org/pep-0621/) compliant. Popular options (at the time of writing of the blog post) are: [flit-core](https://github.com/pypa/flit/tree/main/flit_core), [hatchling](https://pypi.org/project/hatchling/), [pdm-backend](https://pdm-backend.fming.dev/), and [setuptools (>=61)](https://setuptools.pypa.io/en/latest/userguide/pyproject_config.html).
+
+Since the Pypa tutorial uses `hatch` I will stay with that one for the moment.
+
+## How to distribute the package without putting it on Pypi?
+
+The [package repositories](https://py-pkgs.org/04-package-structure#package-repositories) section of [Python packages](https://py-pkgs.org/) states that you can use `pip` to install from a github repository. You can install from a repository branch, a specific commit, or a tag.
+
+## How to install the package after its been build locally to run the tests?
+
+I use conda as a package manager. I install the package using `pip` in a conda environment different than the one where I am developing the package and then run `pytest` on the folder
+
+## How should versioning be handled?
+
+One possibility is to use python semantic release tool. This requires that commits are in the Angular commit style.
+
+## Which git workflow should we use when developing?
+
+A complete example demonstrating a Feature Branch Flow is as follows. Assuming we have a repo setup with a main branch [source](https://www.atlassian.com/git/tutorials/comparing-workflows/gitflow-workflow)
+
+### Examples
+
+```
+git checkout main
+git checkout -b develop
+git checkout -b feature_branch
+# work happens on feature branch
+git checkout develop
+git merge feature_branch
+git checkout main
+git merge develop
+git branch -d feature_branch
+```
+
+## What are the steps for creating a release?
+
+
+
+# Nbdev
+

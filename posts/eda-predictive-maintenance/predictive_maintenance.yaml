@@ -1,0 +1,20 @@
+---
+context:
+  product_id:
+    name: "Product ID"
+    description: ""
+    type: "categorical"
+features:
+  rot_speed:
+    name: "Rot. speed"
+    description: "Rotational speed [rpm]"
+    type: "ratio"
+  type:
+    name: "Type"
+    description: ""
+    type: "categorical"
+target:
+  machine_failure:
+    name: "Machine failure"
+    description: ""
+    type: "binary"

@@ -1,0 +1,11 @@
+---
+title: "Storing tabular data"
+author: "René Valenzuela"
+date: "2023-05-25"
+date-modified: last-modified
+categories: [csv, parquet]
+draft: true
+---
+
+## Requirements
+

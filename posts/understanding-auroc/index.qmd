@@ -1,0 +1,32 @@
+---
+title: "Understanding AUROC"
+author: "René Valenzuela"
+date: "2023-05-25"
+date-modified: last-modified
+categories: [auroc]
+draft: true
+---
+
+## Introduction
+
+Area under the ROC curve is a metric measuring the performance of a binary classifier. Its value can be interpreted as *the probability that randomly chosen instance from the positive class will have a higher score than a randomly chosen instance of the negative class*.
+
+The question being studied in this post is: **How is the previous statement derived and can we see examples of it?**
+
+```{python}
+import pandas as pd
+from sklearn.metrics import roc_auc_score
+```
+
+```{python}
+df_preds = pd.DataFrame({'y_true':[0, 0, 0, 0, 0, 1, 1, 1, 1, 1], 
+                         'y_pred':[0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1]}).reset_index()
+```
+
+```{python}
+roc_auc_score(df_preds['y_true'], df_preds['y_pred'])
+```
+
+```{python}
+
+```

@@ -1,0 +1,22 @@
+---
+title: "Querying Synapse from python"
+author: "René Valenzuela"
+date: "2023-05-24"
+date-modified: last-modified
+categories: [python, synapse]
+draft: true
+---
+
+```{python}
+#| echo: false
+radius = 10
+from IPython.display import display, Markdown
+display(Markdown("""
+The radius of the circle is {radius}.
+""".format(radius = radius)))
+```
+
+In this post I outline the steps needed to connect to a Synapse database from python
+
+I will be following the steps described [here](https://learn.microsoft.com/en-us/azure/azure-sql/database/connect-query-python?view=azuresql)
+

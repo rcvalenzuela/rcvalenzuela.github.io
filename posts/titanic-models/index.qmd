@@ -1,0 +1,274 @@
+---
+title: "Creating tabular models"
+author: "René Valenzuela"
+date: "2023-10-23"
+date-modified: last-modified
+categories: [predictive-modeling]
+draft: true
+---
+
+# Introduction
+
+Given a dataset, how should we go about creating a predictive model for it?
+
+```{python}
+#| echo: false
+
+import numpy as np
+import pandas as pd
+from sklearn.ensemble import HistGradientBoostingClassifier
+from sklearn.pipeline import make_pipeline
+from sklearn.compose import ColumnTransformer
+from sklearn.preprocessing import OrdinalEncoder
+from sklearn.model_selection import cross_validate
+import xgboost as xgb
+import seaborn as sns
+import networkx as nx
+import matplotlib.pyplot as plt
+```
+
+## Extract and transform
+
+```{python}
+raw_df = pd.read_csv('train.csv')
+```
+
+```{python}
+raw_df.columns = raw_df.columns.str.lower()
+```
+
+```{python}
+#| echo: false
+#| output: true
+
+# Extract dtypes
+summ_dtypes = (raw_df
+               .dtypes
+               .to_frame()
+               .reset_index()
+               .rename(columns={'index':'col_name', 0:'dtypes'}))
+
+# Count unique values
+summ_unique = (raw_df
+               .nunique()
+               .to_frame()
+               .reset_index()
+               .rename(columns={'index':'col_name', 0:'n_unique'}))
+
+# Count NA values
+summ_na = (raw_df
+          .isna()
+          .sum()
+          .to_frame()
+          .reset_index()
+          .rename(columns={'index':'col_name', 0:'n_na'}))
+
+summ = summ_dtypes.merge(summ_unique, how='left', on='col_name')
+summ = summ.merge(summ_na, how='left', on='col_name')
+summ
+```
+
+## Create ABT
+
+```{python}
+index_cols = ['passengerid']
+tgt = ['survived']
+```
+
+## Model 1
+
+We will use a `HistGradientBoostingClassifier`
+
+### Features
+
+```{python}
+cat_feats = ['sex']
+num_feats = ['age', 'pclass']
+feats = cat_feats + num_feats
+
+abt_tr = raw_df[feats].copy()
+tgt_tr = raw_df[tgt].copy().iloc[:,0].values
+```
+
+### Model definition
+
+```{python}
+
+cat_pproc = OrdinalEncoder(handle_unknown="use_encoded_value",
+                           unknown_value=-1)
+
+pproc = ColumnTransformer([('cat', cat_pproc, cat_feats)],
+                          remainder="passthrough")
+
+m1 = make_pipeline(pproc, 
+                   HistGradientBoostingClassifier())
+```
+
+### Model fitting
+
+```{python}
+m1.fit(abt_tr, tgt_tr)
+```
+
+### Model evaluation
+
+```{python}
+cv_results = cross_validate(m1, abt_tr, tgt_tr, cv=5)
+```
+
+```{python}
+scores = cv_results["test_score"]
+print("The mean cross-validation accuracy is: "
+      f"{scores.mean():.3f} +/- {scores.std():.3f}")
+```
+
+## Model 2
+
+Add columns which should not require much transformations
+
+### Features
+
+```{python}
+cat_feats = ['sex', 'ticket']
+num_feats = ['age', 'pclass', 'sibsp', 'parch', 'fare']
+feats = cat_feats + num_feats
+
+abt_tr = raw_df[feats].copy()
+```
+
+### Model definition
+
+```{python}
+
+cat_pproc = OrdinalEncoder(handle_unknown="use_encoded_value",
+                           unknown_value=-1)
+
+pproc = ColumnTransformer([('cat', cat_pproc, cat_feats)],
+                          remainder="passthrough")
+
+m2 = make_pipeline(pproc, 
+                   HistGradientBoostingClassifier(max_depth=6, 
+                                                  l2_regularization=10, 
+                                                  max_iter=100))
+```
+
+### Model fitting
+
+```{python}
+m2.fit(abt_tr, tgt_tr)
+```
+
+### Model evaluation
+
+```{python}
+cv_results = cross_validate(m2, abt_tr, tgt_tr, cv=5, return_train_score=True)
+```
+
+```{python}
+tr_scores = cv_results["train_score"]
+print("The mean cross-validation train accuracy is: "
+      f"{tr_scores.mean():.3f} +/- {tr_scores.std():.3f}")
+
+scores = cv_results["test_score"]
+print("The mean cross-validation test accuracy is: "
+      f"{scores.mean():.3f} +/- {scores.std():.3f}")
+
+gen_gap = cv_results["train_score"] - cv_results["test_score"]
+print("The mean cross-validation generalization gap is: "
+      f"{gen_gap.mean():.3f} +/- {gen_gap.std():.3f}")
+
+```
+
+```{python}
+m2_ph = raw_df[feats + tgt].copy()
+m2_ph['pred_prob'] = m2.predict_proba(abt_tr)[:,1]
+m2_ph['abs_err'] = np.abs(m2_ph['survived'] - m2_ph['pred_prob'])
+```
+
+```{python}
+sns.displot(m2_ph, x="pred_prob", hue="survived", kind="kde")
+```
+
+## Model 3
+
+### Features
+
+```{python}
+cat_feats = ['sex', 'ticket']
+num_feats = ['age', 'pclass', 'sibsp', 'parch', 'fare']
+feats = cat_feats + num_feats
+
+abt_tr = raw_df[feats].copy()
+abt_tr["sex"] = abt_tr["sex"].astype("category")
+abt_tr["ticket"] = abt_tr["ticket"].astype("category")
+```
+
+### XGBoost cross-validation
+
+Run cross validation
+
+```{python}
+from sklearn.metrics import f1_score, recall_score, confusion_matrix,roc_auc_score
+
+dtrain_clf = xgb.DMatrix(abt_tr, tgt_tr, enable_categorical = True)
+
+params_1 = {"objective": "binary:logistic"}
+
+n = 1000
+
+results = xgb.cv(params_1,
+                 dtrain_clf,
+                 num_boost_round = n,
+                 nfold=5,
+                 #metrics = ["logloss","auc","error"],
+                 metrics = ["auc"],
+                 early_stopping_rounds=20
+                 )
+```
+
+### Hyperparameter search using Optuna
+
+```{python}
+import optuna 
+from optuna import Trial, visualization
+from optuna.samplers import TPESampler
+from xgboost import XGBClassifier
+from sklearn.model_selection import cross_val_score
+```
+
+```{python}
+def objective(trial: Trial, dtrain_clf) -> float:
+    param = {
+             "n_estimators" : trial.suggest_int('n_estimators', 0, 1000),
+             'max_depth':trial.suggest_int('max_depth', 2, 25),
+             'reg_alpha':trial.suggest_int('reg_alpha', 0, 5),
+             'reg_lambda':trial.suggest_int('reg_lambda', 0, 5),
+             'min_child_weight':trial.suggest_int('min_child_weight', 0, 5),
+             'gamma':trial.suggest_int('gamma', 0, 5),
+             'learning_rate':trial.suggest_loguniform('learning_rate',0.005,0.5),
+             'colsample_bytree':trial.suggest_discrete_uniform('colsample_bytree',0.1,1,0.01),
+             'nthread' : -1
+            }
+    
+    model = XGBClassifier(**param)
+
+    results = xgb.cv(param,
+                     dtrain_clf,
+                     nfold=5,
+                     metrics = ["auc"])
+    return results['test-auc-mean'].mean()
+```
+
+```{python}
+study = optuna.create_study(direction='maximize',sampler=TPESampler())
+study.optimize(lambda trial : objective(trial, dtrain_clf),n_trials= 100)
+
+trial = study.best_trial  
+print("Best Score: ", trial.value)  
+print("Best Params: ")  
+for key, value in trial.params.items():  
+    print("  {}: {}".format(key, value))
+
+
+
+```

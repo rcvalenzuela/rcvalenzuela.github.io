@@ -1,0 +1,16 @@
+---
+title: "Things to follow"
+author: "René Valenzuela"
+date: "2023-07-12"
+date-modified: laahst-modified
+categories: [references]
+draft: true
+---
+
+## Introduction
+
+As I progress in the setup of the website this post will become a page on its own ... in the meantime I will update the links here
+
+## People
+
+- Cosma Shalizi's [webpage](http://bactra.org/) and [notebooks](http://bactra.org/notebooks/) (last visited on July 12, 2023).

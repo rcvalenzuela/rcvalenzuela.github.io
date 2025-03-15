@@ -1,0 +1,16 @@
+---
+title: "Mapping business metrics to model metrics"
+author: "René Valenzuela"
+date: "2024-08-23"
+date-modified: last-modified
+categories: [causal discovery, churn]
+draft: true
+---
+
+Business metrics are metrics used for quantifying business performance. Model metrics are metrics quantifying model quality.
+
+Business metrics reflect the improvement you want to achieve on the business side
+
+# References
+
+- [Measuring success](https://developers.google.com/machine-learning/managing-ml-projects/success)

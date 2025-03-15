@@ -1,0 +1,9 @@
+---
+title: "Preparing DP100"
+author: "René Valenzuela"
+date: "2024-01-28"
+date-modified: last-modified
+categories: [data-science]
+draft: true
+---
+

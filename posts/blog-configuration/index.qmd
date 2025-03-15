@@ -1,0 +1,25 @@
+---
+title: "Configuring the blog"
+author: "René Valenzuela"
+date: "2023-05-18"
+date-modified: last-modified
+categories: [quarto, github]
+draft: true
+---
+
+On this post I keep a record of all the steps needed to configure/publish the blog
+
+![](thumbnail.jpg)
+
+## Publishing to github-pages
+
+I follow the steps described in the [Publish command](https://quarto.org/docs/publishing/github-pages.html#publish-command) section of the Github pages part of the quarto documentation.
+
+In order to use quarto publish from the command line I create a Personal Access token using the instructions [here](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token#creating-a-fine-grained-personal-access-token)
+
+## Adding custom domain
+
+We configure only the main `.github.io` repository with a custom domain in Github as explained in the guide [Managing a custom domain for your GitHub Pages site](https://docs.github.com/en/pages/configuring-a-custom-domain-for-your-github-pages-site/managing-a-custom-domain-for-your-github-pages-site#about-custom-domain-configuration)
+
+The guide states that you must only configure a `CNAME` in the DNS settings but it was necessary to add four `A Record` as explained in the [configuring an apex domain](https://docs.github.com/en/pages/configuring-a-custom-domain-for-your-github-pages-site/managing-a-custom-domain-for-your-github-pages-site#configuring-an-apex-domain) section of the same page.
+

@@ -1,0 +1,8 @@
+---
+title: "AI regulation in Europe"
+author: "René Valenzuela"
+date: "2023-07-20"
+date-modified: last-modified
+categories: [AI, regulation]
+draft: true
+---

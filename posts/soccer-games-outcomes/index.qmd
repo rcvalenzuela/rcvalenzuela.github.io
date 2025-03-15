@@ -1,0 +1,287 @@
+---
+title: "Modeling the outcome of soccer games"
+author: "René Valenzuela"
+execute:
+  echo: false
+date: "2023-07-18"
+date-modified: last-modified
+categories: [predictive-modeling]
+draft: false
+---
+
+<!--
+TODO:
+- Why are some duplicates in games_to_predict_all_res?
+- Add a scatter plot of hma10 versus ama10 ... label by result
+-->
+
+# Introduction
+
+Our goal is to create a model to predict the outcome of La Liga games
+
+# Dataset
+
+The original dataset consists of the results of each of the games played during the 2021-2022 and 2022-2023 seasons. A sample is shown in @tbl-raw,
+
+```{python}
+import numpy as np
+from scipy.stats import poisson
+
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+```
+
+```{python}
+#| echo: false
+
+data_path = 'https://github.com/rcvalenzuela/aatools-data/blob/main/blog/posts/la-liga/curated/la_liga_21_22_23_scores.parquet?raw=true'
+```
+
+```{python}
+all_results = pd.read_parquet(data_path)
+all_results = all_results.sort_values(['date', 'time'])
+all_results = all_results.rename(columns={'hometeam':'ht', 'awayteam':'at'})
+```
+
+```{python}
+#| label: tbl-raw
+#| tbl-cap: "Input dataset. Results of the 21-22 La Liga season"
+
+all_results.head()
+```
+
+where `fthg` stands for full-time home team goals, `ftag` stands for full-time away team goals and `ftr` stands for full-time result which can take values `H` if the game ends in a win for the home team, `A` if the game ends in a win for the away team or `D` if the game ends in a draw.
+
+# Model: Independent Poisson models
+
+## High level approach
+
+- We let the two teams participating in a game be **Team A** and **Team B**.
+- We let the outcome of the game be **W** if the predicted result is that Team A wins, **T** if the game is predicted to end in a tie and **L** if Team A is predicted to lose the game.
+- For each team we model the number of goals scored in a game as a Poisson distribution and we fit one based on historical data. 
+- We assume the number of goals scored by a team in a game is independent of the number of goals scored by the adversary and create a joint probability funcion as the product of the marginals
+- We evaluate the joint distribution on a grid of possible scores
+- We assign the game outcome as the one corresponding to the maximum probability of the game final score. That is, if the final score with highest probability is Team A: 3 and Team B: 2 then the outcome of the game will be **W**
+
+## Hashing out the details
+
+### Fitting the Poisson model
+
+The probability mass function of a Poisson distributed random variable $X$ is:
+$$
+\begin{equation*}
+p_{X}(k) = \mathbb{P}\text{r}\left(X = k\right) = e^{-\lambda}\frac{\lambda^{k}}{k!}
+\end{equation*}
+$$
+
+Given a sample of $n$ realizations of the random variable the MLE of $\lambda$ is simply the sample mean, i.e.,
+$$
+\tilde{\lambda}_{MLE} = \frac{1}{n}\sum_{i=1}^{n} x_{i}
+$$
+
+To fit the Poisson r.v. we must define a sample from which the $\lambda$ parameter will be estimated. The simplest possible approach is to use as a sample the results of the last $N$ games where $N$ is a fixed number. As a starting point we will choose $N = 10$. Since some teams play more than one La Liga game a week 10 games roughly corresponds to a 2 month historic period.
+
+We will fit a Poisson model for each team and for each week (i.e. after a game we will update the model). The implementation is done using a moving average rolling window of the 10 last games of each team.
+
+## Implementation
+
+Starting from the original dataset we construct the input dataset for model fitting. In this dataset we keep for each team the number of goals they scored and make sure we order them in the order of occurrence. A sample is shown in @tbl-results-alaves,
+
+```{python}
+all_results['hp'] = np.where(all_results['ftr'] == 'H', 3,
+                    np.where(all_results['ftr'] == 'D', 1, 0))
+
+all_results['ap'] = np.where(all_results['ftr'] == 'H', 0,
+                    np.where(all_results['ftr'] == 'D', 1, 3))
+```
+
+```{python}
+hometeam_points = (all_results[['season', 'ht', 'hp']]
+                   .rename(columns={'ht':'team', 'hp':'points'}))
+awayteam_points = (all_results[['season', 'at', 'ap']]
+                   .rename(columns={'at':'team', 'ap':'points'}))
+team_points = pd.concat([hometeam_points, awayteam_points])
+```
+
+```{python}
+season_standings = (team_points
+                    .groupby(['season', 'team'])
+                    .sum()
+                    .sort_values(['season', 'points'], ascending=[True, False])
+                    .reset_index())
+```
+
+
+```{python}
+ht_res = (all_results[['season', 'date', 'time', 'ht', 'fthg']]
+          .copy()
+          .rename(columns={'ht':'team', 'fthg':'goals'}))
+at_res = (all_results[['season', 'date', 'time', 'at', 'ftag']]
+          .copy()
+          .rename(columns={'at':'team', 'ftag':'goals'}))
+team_res = (pd.concat([ht_res, at_res])
+            .sort_values(['team', 'date'])
+            .reset_index(drop=True))
+```
+
+
+```{python}
+#| label: tbl-results-alaves
+#| tbl-cap: "Results for the first twelve games of Alaves during the 2021-2022 season"
+
+team_res.loc[team_res.team == 'Alaves'].head(12)
+```
+
+As a check, we verify the number of games each team has played during the course of two seasons. In La Liga, 20 teams play 38 games each during the course of the season. At the end of the season 3 teams are relegated to the second division and 3 are promoted. Hence, over the course of two seasons there should be 17 teams that played both seasons and 6 teams that only played one season. The result of this count is shown in @tbl-games-played
+
+```{python}
+#| label: tbl-games-played
+#| tbl-cap: "Count of total games played by teams over two seasons"
+
+(team_res[['team', 'date']]
+ .groupby('team')
+ .count()
+ .reset_index()
+ .rename(columns={'date':'n_games'})
+ .groupby('n_games')
+ .count()
+ .reset_index())
+```
+
+Model fitting consists in calculating for each team we the rolling mean over a period of previous 10 games. We have to ensure that the result of the current game is not used rolling mean calculation (if we didn't we would have data leakage). The first estimate for the rolling mean will be for the 11th game. A sample of the model fitting results is shown in @tbl-fit-alaves
+
+```{python}
+# When calculating the moving average we exclude the last point from the window to avoid leakage
+team_res['ma10'] = (team_res
+                    .groupby('team')['goals']
+                    .rolling(10, min_periods=10, closed='left')
+                    .mean()
+                    .reset_index(drop=True))
+team_res['games_played'] = (team_res
+                            .sort_values('date')
+                            .groupby(['season', 'team'])
+                            .cumcount())
+team_res['season_game'] = team_res['games_played'] + 1
+```
+
+```{python}
+#| label: tbl-fit-alaves
+#| tbl-cap: "Model fitting for the first twelve games of Alaves during the 2021-2022 season"
+
+team_res.loc[team_res.team == 'Alaves'].head(12)
+```
+
+```{python}
+# Select season
+the_season = 's_21_22'
+# Create wide dataset for heatmap visualization
+team_res_wide = (team_res[team_res.season == the_season]
+                 .pivot(index="team", columns="season_game", values="ma10"))
+
+# Reorder index by end of season standings
+team_res_wide.index = pd.CategoricalIndex(team_res_wide.index, 
+    categories=season_standings[season_standings.season == the_season]['team'])
+team_res_wide.sort_index(level=0, inplace=True)
+```
+
+The ovarall results of model fitting can be visualized in @fig-ind-poisson-fit, a heatmap of the rate parameter for each team and for each week.
+
+```{python}
+#| label: fig-ind-poisson-fit
+#| fig-cap: "Heatmap of rate parameter by team and season game"
+
+ax = sns.heatmap(team_res_wide, linewidths=0.4, cmap=sns.color_palette("crest", as_cmap=True))
+plt.show()
+```
+
+The teams are ordered by rows with the team that finished in the first place in the first row and so on. Each square on the grid is colored according to the value of the fitted rate parameter and the columns represent the number of games played, i.e. the column labeled `11` represents the eleventh game of each team. This will almost always correspond to the week of the season. Also, note that the first game for which we have a parameter is the eleventh game of each team since we chose an 10 games window for teh moving average
+
+Teams in the top rows have a higher rate parameter and also some teams that went on a scoring streak during the season. Amongst them we have Villareal at the start of the second leg and Levante at the end of the season.
+
+## Generating predictions
+
+To generate predictions we first attach the estimated rate parameters of the home team and of the away team for each game played in the season:
+
+
+```{python}
+
+# Recover games for which we need to provide a prediction
+games_to_predict = (all_results
+                    .merge(team_res.rename(columns={'team':'ht', 
+                                                    'ma10':'hma10', 
+                                                    'goals':'hgoals'}),
+                           how='left', 
+                           left_on=['season', 'date', 'time', 'ht'],
+                           right_on=['season', 'date', 'time', 'ht'])
+                    .merge(team_res.rename(columns={'team':'at', 
+                                                    'ma10':'ama10', 
+                                                    'goals':'agoals'}), 
+                           how='left', 
+                           left_on=['season', 'date', 'time', 'at'],
+                           right_on=['season', 'date', 'time', 'at'])
+                    .sort_values(['date', 'time']))
+
+
+```
+
+```{python}
+gtp_cols = ['ht', 'at', 'ftr', 'hma10', 'ama10']
+games_to_predict[gtp_cols].head()
+```
+
+
+We then generate (for each game) all possible results starting from 0-0 and up to 5-5, i.e. 36 possible scores for each game and assign the corresponding probability using the Poisson mass probability function
+
+```{python}
+# Create grid of results to evaluate
+goals_grid = pd.DataFrame({'goals':range(6)})
+goals_grid = (goals_grid.merge(goals_grid, how='cross')
+              .rename(columns={'goals_x':'pred_hgoals', 'goals_y':'pred_agoals'}))
+
+# Expand to include all possible results in the generated range
+games_to_predict_all_res = games_to_predict.merge(goals_grid, how='cross')
+
+```
+
+
+```{python}
+games_to_predict_all_res['h_prob'] = poisson.pmf(games_to_predict_all_res['pred_hgoals'], 
+                                                 games_to_predict_all_res['hma10'])
+games_to_predict_all_res['a_prob'] = poisson.pmf(games_to_predict_all_res['pred_agoals'], 
+                                                 games_to_predict_all_res['ama10'])
+games_to_predict_all_res['joint_prob'] = games_to_predict_all_res['h_prob'] * games_to_predict_all_res['a_prob']
+
+```
+
+```{python}
+gtp_all_res_cols = ['ht', 'at', 'fthg', 'ftag', 'ftr', 'hma10', 'ama10', 'pred_hgoals', 'pred_agoals', 'h_prob', 'a_prob', 'joint_prob']
+games_to_predict_all_res[gtp_all_res_cols].dropna().sort_values(['ht', 'at', 'joint_prob'], ascending=False).head(50)
+```
+
+```{python}
+pred_cols = all_results.columns.to_list() + ['pred_hgoals', 'pred_agoals', 'joint_prob']
+predictions = (games_to_predict_all_res[pred_cols]
+               .sort_values('joint_prob', ascending=False)
+               .groupby(all_results.columns.to_list())
+               .first()
+               .reset_index())
+```
+
+```{python}
+predictions['pred_ftr'] = np.where(predictions['pred_hgoals'] > predictions['pred_agoals'], 'H',
+                          np.where(predictions['pred_hgoals'] == predictions['pred_agoals'], 'D', 'A'))
+```
+
+```{python}
+df2 = pd.crosstab(predictions.ftr, predictions.pred_ftr)
+```
+
+```{python}
+from sklearn.metrics import accuracy_score, balanced_accuracy_score
+
+print(f'The accuracy of the model is {accuracy_score(predictions.ftr, predictions.pred_ftr, normalize=True):.4f} and the balanced accuracy is {balanced_accuracy_score(predictions.ftr, predictions.pred_ftr):.4f}')
+```
+
+# Model: Random forest of home and away goal rates
+

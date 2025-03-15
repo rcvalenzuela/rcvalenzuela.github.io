@@ -7,7 +7,7 @@ website:
     right:
       - href: index.qmd
         text: Home
-      - href: /ml-blog/
+      - href: blog.qmd
         text: Blog
       - talks.qmd
   page-footer: 

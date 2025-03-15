@@ -1,0 +1,166 @@
+---
+title: "Simulation of basic causal structures"
+author: "René Valenzuela"
+date: "2024-10-28"
+date-modified: last-modified
+categories: [causal inference]
+draft: false
+---
+
+```{python}
+#| echo: false
+
+import numpy as np
+import pandas as pd
+from sklearn.linear_model import LinearRegression
+
+# Create the generator
+rng = np.random.default_rng()
+```
+
+## Introduction
+
+We consider the problem of estimating the effect of variable $X$ on a target variable $Y$ from a sample obtained from an unnknown distribution. For simplicity in our first example both $X$ and $Y$ are binary variables. Also, there is an extra variable $Z$ which is also binary.
+
+```{python}
+#| echo: False
+
+n_corr_not_cause = 10000
+
+# Create background factors
+u_x = rng.standard_normal(n_corr_not_cause)
+u_y = rng.standard_normal(n_corr_not_cause)
+u_z = rng.standard_normal(n_corr_not_cause)
+
+# Define variables
+z = 1*(u_z > 0)
+x = 1*(z + u_x > 0.5)
+y = 1*(x + z + u_y > 2)
+y_dox = 1*(1 + z + u_y > 2)
+```
+
+```{python}
+#| echo: False
+obs = pd.DataFrame({'X':x, 'Z':z, 'Y':y})
+obs.head(10)
+```
+
+We assume that we have no additional knowledge. The first step is to understand what do we mean by the effect of $X$ on $Y$. Here the implicit question is **if I set the value of $X$ to 1 how will I affect the value of $Y$**
+
+One possibility to estimate this effect would be
+$$
+\hat{e}_{1} = \mathbb{E}\left[Y \mid X = 0\right] - \mathbb{E}\left[Y \mid X = 1\right]
+$$
+
+```{python}
+e1 = obs.loc[obs.X == 1, 'Y'].mean() - obs.loc[obs.X == 0, 'Y'].mean()
+```
+
+**Correlation does not imply causation** refers to the inability to legitimately deduce a cause-and-effect relationship between two events or variables solely on the basis of an observed association or correlation between them <a href="#wik_corrnotcause">(Correlation does not imply causation)</a>. Although this statement agrees with what our common sense tells us only recently a proper causal inference framework has been developed which allows us to formally specify the difference.
+
+
+
+Correlation in its broadest sense may indicate any type of association, i.e. any statistical relationship whether causal or not, between two random variables. This can be formally written as
+$$
+\mathbb{E}\left[ Y \mid X = x \right] = f(x)
+$$
+
+
+
+1) We want to show that the magnitude of a direct causal effect is different from the value of the variable condtional on the other one being set to a given value
+2) Understand the correct approach to fit a model given the data and its correponding SCM
+
+## Example
+
+We consider the following structural causal model (as defined in Section 1.5 of <a href="#cis">(Pearl 2016)</a>)
+$$
+\begin{align*}
+f_{Z} &: Z = 1_{U_{Z} > 0} \\
+f_{X} &: X = 1_{Z + U_{X} > 0.5} \\
+f_{Y} &: Y = 1_{X + Z + U_{Y} > 2}
+\end{align*}
+$$
+where $U = \{ U_{X}, U_{Y}, U_{Z} \}$ is the set of exogenous variables, $V = \{ X, Y, Z \}$ is the set of endogenous variables and $1_{A}$ is the indicator function of the event $A$. The associated graphical causal model is
+```{dot}
+digraph G {
+  Uz -> Z;
+  Ux -> X;
+  Z -> X;
+  Uy -> Y;
+  Z -> Y;
+  X -> Y;
+}
+```
+
+We will assume $U_{i}$ are standard normal random variables. Recall that for binary variables probabilities are equal to means and computing conditional probabilities is particularly easy.
+
+We see that $P\left( Y \mid \text{do}\left(X\right)\right)$ is different from $P\left( Y \mid X = 1\right)$
+
+```{python}
+print(f'{np.mean(y)}, {np.mean(y_dox)}, {np.mean(y[x==1])}')
+```
+
+
+
+## SEM versus SCM
+
+Consider the following structural equation model,
+$$
+asp = 2hd
+str = asp + hd
+$$
+
+which is represented as follows
+
+```{mermaid}
+flowchart LR
+  hd([HD])
+  asp([ASP])
+  str([STR])
+  hd -- 2 --> asp
+  hd -- 1 --> str
+  asp -- 1 --> str
+```
+
+Our goal is to estimate the coefficients from a sample of the data
+
+```{python}
+
+# Size of sample
+n_sample = 100
+
+abt = pd.DataFrame({'hd':rng.random(n_sample)})
+abt['asp'] = 2 * abt['hd']
+abt['str'] = abt['hd'] + abt['asp']
+```
+
+We use a linear regression model to generate the estimation
+
+```{python}
+reg = LinearRegression().fit(abt[['asp']], abt[['str']])
+```
+
+The coefficient of determination is given by `{python} reg.score(abt[['asp']], abt[['str']])`
+
+
+```{python}
+print(reg.coef_, reg.intercept_)
+```
+
+```{python}
+reg_adj = LinearRegression().fit(abt[['hd', 'asp']], abt[['str']])
+```
+
+```{python}
+reg_adj.score(abt[['hd', 'asp']], abt[['str']])
+```
+
+```{python}
+print(reg_adj.coef_, reg_adj.intercept_)
+```
+
+## References
+
+1. Section 1.6 R examples. Causal Data Science with Directed Acyclic graphs. Udemy
+2. <a name="cis">Pearl 2016</a>: Causal inference in Statistics. A primer. Judea Pearl, Madelyn Glymour and Nicholas P. Jewell
+3. <a name="#wik_corrnotcause">Correlation does not imply causation</a>: Wikipedia article [Correlation does not imply causation](https://en.wikipedia.org/wiki/Correlation_does_not_imply_causation)

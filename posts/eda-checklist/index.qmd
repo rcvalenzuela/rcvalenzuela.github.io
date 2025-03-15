@@ -1,0 +1,11 @@
+---
+title: "Exploratory data analysis checklist"
+author: "Rene Valenzuela"
+date: "2023-05-21"
+date-modified: last-modified
+categories: [eda, checklist]
+image: "image.jpg"
+draft: true
+---
+
+1. Write and check assumptions about your data

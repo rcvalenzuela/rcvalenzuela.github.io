@@ -1,0 +1,63 @@
+---
+title: "Measuring degree of association between variables"
+author: "René Valenzuela"
+date: "2024-04-07"
+date-modified: last-modified
+categories: [association]
+draft: true
+---
+
+
+```{python}
+#| echo: false
+
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+from sklearn.feature_selection import mutual_info_regression
+```
+
+```{python}
+mods = pd.DataFrame({'x': np.linspace(0, 5, num=50, endpoint=True)})
+```
+
+```{python}
+# Modelo lineal
+a = 1.5
+b = 0.5
+```
+
+```{python}
+mods['y_lin'] = a * mods['x'] + b
+```
+
+```{python}
+r = 1
+theta =  np.linspace(0, 2 * np.pi, num=200, endpoint=True)
+x_circle = r * np.cos(theta)
+y_circle = r * np.sin(theta)
+df_circle = pd.DataFrame({'x':x_circle, 'y':y_circle})
+```
+
+```{python}
+fig, ax = plt.subplots()
+ax.plot(df_circle['x'], df_circle['y'])
+plt.show()
+```
+
+Existen varias formas de normalizar la *información mutua* al intervalo $[0,1]$. 
+
+
+
+
+```{python}
+mi_xy = mutual_info_regression(df_circle[['x']], df_circle['y'], discrete_features=[False])
+mi_coeff = np.sqrt(1 - np.exp(-2*mi_xy))
+
+print(f'The mutual information between x,y is:{mi_xy[0]:.2f}, the mutual information coefficient is {mi_coeff[0]:.2f}')
+```
+
+## References
+
+1. [An Undeservedly Forgotten Correlation Coefficient](https://towardsdatascience.com/an-undeservedly-forgotten-correlation-coefficient-86245ccb774c)

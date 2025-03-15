@@ -1,0 +1,10 @@
+---
+title: "Semantic dataframes"
+author: "René Valenzuela"
+date: "2023-08-31"
+date-modified: last-modified
+categories: [python]
+draft: true
+---
+
+# What is a semantic dataframe?
