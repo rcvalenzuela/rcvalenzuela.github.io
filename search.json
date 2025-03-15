@@ -1,10 +1,94 @@
 [
   {
-    "objectID": "about.html",
-    "href": "about.html",
-    "title": "About",
+    "objectID": "posts/basic-causal-stuctures/index.html",
+    "href": "posts/basic-causal-stuctures/index.html",
+    "title": "Simulation of basic causal structures",
     "section": "",
-    "text": "About this site"
+    "text": "We consider the problem of estimating the effect of variable \\(X\\) on a target variable \\(Y\\) from a sample obtained from an unnknown distribution. For simplicity in our first example both \\(X\\) and \\(Y\\) are binary variables. Also, there is an extra variable \\(Z\\) which is also binary.\n\n\n\n\n\n\n\n\n\nX\nZ\nY\n\n\n\n\n0\n1\n1\n0\n\n\n1\n1\n0\n0\n\n\n2\n0\n0\n0\n\n\n3\n1\n1\n1\n\n\n4\n1\n1\n0\n\n\n5\n0\n1\n0\n\n\n6\n0\n0\n0\n\n\n7\n1\n1\n1\n\n\n8\n0\n0\n0\n\n\n9\n1\n1\n0\n\n\n\n\n\n\n\nWe assume that we have no additional knowledge. The first step is to understand what do we mean by the effect of \\(X\\) on \\(Y\\). Here the implicit question is if I set the value of \\(X\\) to 1 how will I affect the value of \\(Y\\)\nOne possibility to estimate this effect would be \\[\n\\hat{e}_{1} = \\mathbb{E}\\left[Y \\mid X = 0\\right] - \\mathbb{E}\\left[Y \\mid X = 1\\right]\n\\]\n\ne1 = obs.loc[obs.X == 1, 'Y'].mean() - obs.loc[obs.X == 0, 'Y'].mean()\n\nCorrelation does not imply causation refers to the inability to legitimately deduce a cause-and-effect relationship between two events or variables solely on the basis of an observed association or correlation between them (Correlation does not imply causation). Although this statement agrees with what our common sense tells us only recently a proper causal inference framework has been developed which allows us to formally specify the difference.\nCorrelation in its broadest sense may indicate any type of association, i.e. any statistical relationship whether causal or not, between two random variables. This can be formally written as \\[\n\\mathbb{E}\\left[ Y \\mid X = x \\right] = f(x)\n\\]\n\nWe want to show that the magnitude of a direct causal effect is different from the value of the variable condtional on the other one being set to a given value\nUnderstand the correct approach to fit a model given the data and its correponding SCM"
+  },
+  {
+    "objectID": "posts/basic-causal-stuctures/index.html#introduction",
+    "href": "posts/basic-causal-stuctures/index.html#introduction",
+    "title": "Simulation of basic causal structures",
+    "section": "",
+    "text": "We consider the problem of estimating the effect of variable \\(X\\) on a target variable \\(Y\\) from a sample obtained from an unnknown distribution. For simplicity in our first example both \\(X\\) and \\(Y\\) are binary variables. Also, there is an extra variable \\(Z\\) which is also binary.\n\n\n\n\n\n\n\n\n\nX\nZ\nY\n\n\n\n\n0\n1\n1\n0\n\n\n1\n1\n0\n0\n\n\n2\n0\n0\n0\n\n\n3\n1\n1\n1\n\n\n4\n1\n1\n0\n\n\n5\n0\n1\n0\n\n\n6\n0\n0\n0\n\n\n7\n1\n1\n1\n\n\n8\n0\n0\n0\n\n\n9\n1\n1\n0\n\n\n\n\n\n\n\nWe assume that we have no additional knowledge. The first step is to understand what do we mean by the effect of \\(X\\) on \\(Y\\). Here the implicit question is if I set the value of \\(X\\) to 1 how will I affect the value of \\(Y\\)\nOne possibility to estimate this effect would be \\[\n\\hat{e}_{1} = \\mathbb{E}\\left[Y \\mid X = 0\\right] - \\mathbb{E}\\left[Y \\mid X = 1\\right]\n\\]\n\ne1 = obs.loc[obs.X == 1, 'Y'].mean() - obs.loc[obs.X == 0, 'Y'].mean()\n\nCorrelation does not imply causation refers to the inability to legitimately deduce a cause-and-effect relationship between two events or variables solely on the basis of an observed association or correlation between them (Correlation does not imply causation). Although this statement agrees with what our common sense tells us only recently a proper causal inference framework has been developed which allows us to formally specify the difference.\nCorrelation in its broadest sense may indicate any type of association, i.e. any statistical relationship whether causal or not, between two random variables. This can be formally written as \\[\n\\mathbb{E}\\left[ Y \\mid X = x \\right] = f(x)\n\\]\n\nWe want to show that the magnitude of a direct causal effect is different from the value of the variable condtional on the other one being set to a given value\nUnderstand the correct approach to fit a model given the data and its correponding SCM"
+  },
+  {
+    "objectID": "posts/basic-causal-stuctures/index.html#example",
+    "href": "posts/basic-causal-stuctures/index.html#example",
+    "title": "Simulation of basic causal structures",
+    "section": "Example",
+    "text": "Example\nWe consider the following structural causal model (as defined in Section 1.5 of (Pearl 2016)) \\[\n\\begin{align*}\nf_{Z} &: Z = 1_{U_{Z} &gt; 0} \\\\\nf_{X} &: X = 1_{Z + U_{X} &gt; 0.5} \\\\\nf_{Y} &: Y = 1_{X + Z + U_{Y} &gt; 2}\n\\end{align*}\n\\] where \\(U = \\{ U_{X}, U_{Y}, U_{Z} \\}\\) is the set of exogenous variables, \\(V = \\{ X, Y, Z \\}\\) is the set of endogenous variables and \\(1_{A}\\) is the indicator function of the event \\(A\\). The associated graphical causal model is\n\n\n\n\n\n\n\nG\n\n\n\nUz\n\nUz\n\n\n\nZ\n\nZ\n\n\n\nUz-&gt;Z\n\n\n\n\n\nX\n\nX\n\n\n\nZ-&gt;X\n\n\n\n\n\nY\n\nY\n\n\n\nZ-&gt;Y\n\n\n\n\n\nUx\n\nUx\n\n\n\nUx-&gt;X\n\n\n\n\n\nX-&gt;Y\n\n\n\n\n\nUy\n\nUy\n\n\n\nUy-&gt;Y\n\n\n\n\n\n\n\n\n\n\nWe will assume \\(U_{i}\\) are standard normal random variables. Recall that for binary variables probabilities are equal to means and computing conditional probabilities is particularly easy.\nWe see that \\(P\\left( Y \\mid \\text{do}\\left(X\\right)\\right)\\) is different from \\(P\\left( Y \\mid X = 1\\right)\\)\n\nprint(f'{np.mean(y)}, {np.mean(y_dox)}, {np.mean(y[x==1])}')\n\n0.2278, 0.3297, 0.39217252396166136"
+  },
+  {
+    "objectID": "posts/basic-causal-stuctures/index.html#sem-versus-scm",
+    "href": "posts/basic-causal-stuctures/index.html#sem-versus-scm",
+    "title": "Simulation of basic causal structures",
+    "section": "SEM versus SCM",
+    "text": "SEM versus SCM\nConsider the following structural equation model, \\[\nasp = 2hd\nstr = asp + hd\n\\]\nwhich is represented as follows\n\n\n\n\n\nflowchart LR\n  hd([HD])\n  asp([ASP])\n  str([STR])\n  hd -- 2 --&gt; asp\n  hd -- 1 --&gt; str\n  asp -- 1 --&gt; str\n\n\n\n\n\n\nOur goal is to estimate the coefficients from a sample of the data\n\n# Size of sample\nn_sample = 100\n\nabt = pd.DataFrame({'hd':rng.random(n_sample)})\nabt['asp'] = 2 * abt['hd']\nabt['str'] = abt['hd'] + abt['asp']\n\nWe use a linear regression model to generate the estimation\n\nreg = LinearRegression().fit(abt[['asp']], abt[['str']])\n\nThe coefficient of determination is given by 1.0\n\nprint(reg.coef_, reg.intercept_)\n\n[[1.5]] [-4.4408921e-16]\n\n\n\nreg_adj = LinearRegression().fit(abt[['hd', 'asp']], abt[['str']])\n\n\nreg_adj.score(abt[['hd', 'asp']], abt[['str']])\n\n1.0\n\n\n\nprint(reg_adj.coef_, reg_adj.intercept_)\n\n[[0.6 1.2]] [8.8817842e-16]"
+  },
+  {
+    "objectID": "posts/basic-causal-stuctures/index.html#references",
+    "href": "posts/basic-causal-stuctures/index.html#references",
+    "title": "Simulation of basic causal structures",
+    "section": "References",
+    "text": "References\n\nSection 1.6 R examples. Causal Data Science with Directed Acyclic graphs. Udemy\nPearl 2016: Causal inference in Statistics. A primer. Judea Pearl, Madelyn Glymour and Nicholas P. Jewell\nCorrelation does not imply causation: Wikipedia article Correlation does not imply causation"
+  },
+  {
+    "objectID": "posts/eda-neighbours-graph/index.html",
+    "href": "posts/eda-neighbours-graph/index.html",
+    "title": "Exploratory data analysis. Neighbours graph",
+    "section": "",
+    "text": "We want to study the heterogeneity of the sample and how is the target distributed along the samples. To do so we will first identify groups of observations that are close to each other (small cluster) and then we will represent this on a graph.\nWe will define a hierarchical? similarity metric where first we define similarity metrics across each variable and then a higher order? metric which is simply the sum of the similarities for each metric.\nThe similarity metric for each variable will depend on the type of the variable:\n\nBinary or nominal: The similarity will be 1 if they agree on value and 0 otherwise.\nOrdinal: The similarity will be 1 if they share the same value, 0.5 if they differ in only one level and 0 otherwise.\nContinuous: Define two thresholds \\(t_{1}\\) and \\(t_{2}\\) with \\(t_{1} &lt; t_{2}\\). Calculate the distance between two instances \\(d_{i,j}\\). Then, the similarity \\(s_{i,j}\\) is, \\[\ns_{i,j} = \\begin{cases} 1 & d_{i,j \\leq t_{1}} \\\\ 0.5 & t_{1} &lt; d_{i,j \\leq t_{2}} \\\\ 0 & \\text{otherwise} \\end{cases}\n\\]"
+  },
+  {
+    "objectID": "posts/eda-neighbours-graph/index.html#sex",
+    "href": "posts/eda-neighbours-graph/index.html#sex",
+    "title": "Exploratory data analysis. Neighbours graph",
+    "section": "Sex",
+    "text": "Sex\n\n# Find neighbours based on sex\nsex_nbh = sim_score(raw_df.sex, raw_df.passengerid)\nsex_nbh = sex_nbh.rename(columns={'sim':'weight'})"
+  },
+  {
+    "objectID": "posts/eda-neighbours-graph/index.html#passenger-class",
+    "href": "posts/eda-neighbours-graph/index.html#passenger-class",
+    "title": "Exploratory data analysis. Neighbours graph",
+    "section": "Passenger class",
+    "text": "Passenger class\n\n# Find neighbours based on passenger class\npclass_nbh = sim_score(raw_df.pclass, raw_df.passengerid)\npclass_nbh = pclass_nbh.rename(columns={'sim':'weight'})\n\n\n# Find neighbours based on passenger class\n#nbh_cols = ['pclass']\n#pclass_nbh = raw_df[index_cols + nbh_cols].copy()\n#pclass_nbh = (pclass_nbh.merge(pclass_nbh, on='pclass', how='left')\n#              .rename(columns={'passengerid_x': 'src', 'passengerid_y': 'dest'}))\n#pclass_nbh = pclass_nbh.loc[pclass_nbh.src &lt; pclass_nbh.dest, ['src', 'dest']]\n#pclass_nbh['weight'] = 1"
+  },
+  {
+    "objectID": "posts/eda-neighbours-graph/index.html#sibsp",
+    "href": "posts/eda-neighbours-graph/index.html#sibsp",
+    "title": "Exploratory data analysis. Neighbours graph",
+    "section": "Sibsp",
+    "text": "Sibsp\n\nraw_df['sibsp'].value_counts().to_frame().reset_index()\n\n\n\n\n\n\n\n\nsibsp\ncount\n\n\n\n\n0\n0\n608\n\n\n1\n1\n209\n\n\n2\n2\n28\n\n\n3\n4\n18\n\n\n4\n3\n16\n\n\n5\n8\n7\n\n\n6\n5\n5\n\n\n\n\n\n\n\nWe decide to group as follows:\n\n0: 0\n1: 1\n2: 2, 3\n3: 2, 3, 4\n4: &gt;= 4\n\n\nnbh_cols = ['sibsp']\nsibsp_nbh = raw_df[index_cols + nbh_cols].copy()\n\nsibsp_l2 = sibsp_nbh[sibsp_nbh.sibsp == 2]\nsibsp_l3 = sibsp_nbh[sibsp_nbh.sibsp == 3]\nsibsp_l4 = sibsp_nbh[sibsp_nbh.sibsp == 4]\nsibsp_l4p = sibsp_nbh[sibsp_nbh.sibsp &gt;= 4]\n\n# Pairs where sibsp value is the same 0-0, 1-1, 2-2, ... and so on\nsibsp_nbh = (sibsp_nbh.merge(sibsp_nbh, on='sibsp', how='left')\n              .rename(columns={'passengerid_x': 'src', 'passengerid_y': 'dest'}))\nsibsp_nbh_23 = (sibsp_l2[['passengerid']].merge(sibsp_l3[['passengerid']], how='cross')\n                 .rename(columns={'passengerid_x': 'src', 'passengerid_y': 'dest'}))\nsibsp_nbh_23.values.sort()\n\n# Remove duplicated\nsibsp_nbh = sibsp_nbh.loc[sibsp_nbh.src &lt; sibsp_nbh.dest, ['src', 'dest']]"
+  },
+  {
+    "objectID": "posts/eda-neighbours-graph/index.html#generate-neighbours-overall-edges",
+    "href": "posts/eda-neighbours-graph/index.html#generate-neighbours-overall-edges",
+    "title": "Exploratory data analysis. Neighbours graph",
+    "section": "Generate neighbours overall edges",
+    "text": "Generate neighbours overall edges\n\n# Add neighbours edges between every \nnbh_edges = pd.concat([sex_nbh, pclass_nbh])\nnbh_edges = nbh_edges.groupby(['src', 'dest']).sum().reset_index()\n\n# In our first analysis, since we calculated edges over two variables we will say two instances are neighbours if they were close over each of the two variables\nn_feats = 2\nnbh_edges = nbh_edges.loc[nbh_edges.weight == n_feats]\n\n\n# Create the graph\nnbh_nodes = list(raw_df.passengerid.unique())\nnd_color = ['red' if surv == 1 else 'blue' for surv in raw_df.survived]\n\nnbh = nx.Graph()\nnbh.add_nodes_from(nbh_nodes)\nnbh.add_edges_from([(src, dest) for src,dest in zip(nbh_edges.src, nbh_edges.dest)])"
+  },
+  {
+    "objectID": "posts/eda-neighbours-graph/index.html#compute-connected-components",
+    "href": "posts/eda-neighbours-graph/index.html#compute-connected-components",
+    "title": "Exploratory data analysis. Neighbours graph",
+    "section": "Compute connected components",
+    "text": "Compute connected components\n\nconn_comp = nx.connected_components(nbh)\ndfs = list()\nidx = 0\nfor c in conn_comp:\n    dfs.append(pd.DataFrame(data={'passengerid':list(c), 'conn_comp_idx':idx}))\n    idx += 1\nnbh_tgt = pd.concat(dfs).sort_values('passengerid')\nnbh_tgt = nbh_tgt.merge(raw_df[index_cols + tgt_col], on='passengerid', how='left')\n\n\nnbh_tgt.groupby('conn_comp_idx').agg({'survived': ['count', 'sum', 'mean']})\n\n\n\n\n\n\n\n\nsurvived\n\n\n\ncount\nsum\nmean\n\n\nconn_comp_idx\n\n\n\n\n\n\n\n0\n347\n47\n0.135447\n\n\n1\n94\n91\n0.968085\n\n\n2\n144\n72\n0.500000\n\n\n3\n122\n45\n0.368852\n\n\n4\n76\n70\n0.921053\n\n\n5\n108\n17\n0.157407"
+  },
+  {
+    "objectID": "posts/eda-neighbours-graph/index.html#visualization",
+    "href": "posts/eda-neighbours-graph/index.html#visualization",
+    "title": "Exploratory data analysis. Neighbours graph",
+    "section": "Visualization",
+    "text": "Visualization\n\n# Create the graph visualization\nplot_options = {\"node_size\": 10, \"with_labels\": False, \"width\": 0.15}\npos = nx.spring_layout(nbh, iterations=15, seed=1721)\nfig, ax = plt.subplots(figsize=(15, 9))\nax.axis(\"off\")\nnx.draw_networkx(nbh, pos=pos, ax=ax, **plot_options)"
+  },
+  {
+    "objectID": "talks.html",
+    "href": "talks.html",
+    "title": "Talks",
+    "section": "",
+    "text": "Talks"
   },
   {
     "objectID": "index.html",
@@ -14,10 +98,66 @@
     "text": "Hi there! I’m René a data scientist with a passion for teaching and exploring new things"
   },
   {
-    "objectID": "talks.html",
-    "href": "talks.html",
-    "title": "Talks",
+    "objectID": "blog.html",
+    "href": "blog.html",
+    "title": "Understanding Machine Learning",
     "section": "",
-    "text": "Talks"
+    "text": "Simulation of basic causal structures\n\n\n\n\n\n\ncausal inference\n\n\n\n\n\n\n\n\n\nOct 28, 2024\n\n\nRené Valenzuela\n\n\n\n\n\n\n\n\n\n\n\n\nWhat is … conformal prediction\n\n\n\n\n\n\npredictive-modeling\n\n\n\n\n\n\n\n\n\nJan 9, 2024\n\n\nRené Valenzuela\n\n\n\n\n\n\n\n\n\n\n\n\nExploratory data analysis. Neighbours graph\n\n\n\n\n\n\nnetworks\n\n\neda\n\n\n\n\n\n\n\n\n\nDec 7, 2023\n\n\nRené Valenzuela\n\n\n\n\n\n\n\n\n\n\n\n\nModeling the outcome of soccer games\n\n\n\n\n\n\npredictive-modeling\n\n\n\n\n\n\n\n\n\nJul 18, 2023\n\n\nRené Valenzuela\n\n\n\n\n\n\nNo matching items"
+  },
+  {
+    "objectID": "about.html",
+    "href": "about.html",
+    "title": "About",
+    "section": "",
+    "text": "About this site"
+  },
+  {
+    "objectID": "posts/soccer-games-outcomes/index.html",
+    "href": "posts/soccer-games-outcomes/index.html",
+    "title": "Modeling the outcome of soccer games",
+    "section": "",
+    "text": "Our goal is to create a model to predict the outcome of La Liga games"
+  },
+  {
+    "objectID": "posts/soccer-games-outcomes/index.html#high-level-approach",
+    "href": "posts/soccer-games-outcomes/index.html#high-level-approach",
+    "title": "Modeling the outcome of soccer games",
+    "section": "High level approach",
+    "text": "High level approach\n\nWe let the two teams participating in a game be Team A and Team B.\nWe let the outcome of the game be W if the predicted result is that Team A wins, T if the game is predicted to end in a tie and L if Team A is predicted to lose the game.\nFor each team we model the number of goals scored in a game as a Poisson distribution and we fit one based on historical data.\nWe assume the number of goals scored by a team in a game is independent of the number of goals scored by the adversary and create a joint probability funcion as the product of the marginals\nWe evaluate the joint distribution on a grid of possible scores\nWe assign the game outcome as the one corresponding to the maximum probability of the game final score. That is, if the final score with highest probability is Team A: 3 and Team B: 2 then the outcome of the game will be W"
+  },
+  {
+    "objectID": "posts/soccer-games-outcomes/index.html#hashing-out-the-details",
+    "href": "posts/soccer-games-outcomes/index.html#hashing-out-the-details",
+    "title": "Modeling the outcome of soccer games",
+    "section": "Hashing out the details",
+    "text": "Hashing out the details\n\nFitting the Poisson model\nThe probability mass function of a Poisson distributed random variable \\(X\\) is: \\[\n\\begin{equation*}\np_{X}(k) = \\mathbb{P}\\text{r}\\left(X = k\\right) = e^{-\\lambda}\\frac{\\lambda^{k}}{k!}\n\\end{equation*}\n\\]\nGiven a sample of \\(n\\) realizations of the random variable the MLE of \\(\\lambda\\) is simply the sample mean, i.e., \\[\n\\tilde{\\lambda}_{MLE} = \\frac{1}{n}\\sum_{i=1}^{n} x_{i}\n\\]\nTo fit the Poisson r.v. we must define a sample from which the \\(\\lambda\\) parameter will be estimated. The simplest possible approach is to use as a sample the results of the last \\(N\\) games where \\(N\\) is a fixed number. As a starting point we will choose \\(N = 10\\). Since some teams play more than one La Liga game a week 10 games roughly corresponds to a 2 month historic period.\nWe will fit a Poisson model for each team and for each week (i.e. after a game we will update the model). The implementation is done using a moving average rolling window of the 10 last games of each team."
+  },
+  {
+    "objectID": "posts/soccer-games-outcomes/index.html#implementation",
+    "href": "posts/soccer-games-outcomes/index.html#implementation",
+    "title": "Modeling the outcome of soccer games",
+    "section": "Implementation",
+    "text": "Implementation\nStarting from the original dataset we construct the input dataset for model fitting. In this dataset we keep for each team the number of goals they scored and make sure we order them in the order of occurrence. A sample is shown in Table 2,\n\n\n\n\nTable 2: Results for the first twelve games of Alaves during the 2021-2022 season\n\n\n\n\n\n\n\n\n\n\nseason\ndate\ntime\nteam\ngoals\n\n\n\n\n0\ns_21_22\n2021-08-14\n21:00\nAlaves\n1\n\n\n1\ns_21_22\n2021-08-21\n16:00\nAlaves\n0\n\n\n2\ns_21_22\n2021-08-27\n21:15\nAlaves\n0\n\n\n3\ns_21_22\n2021-09-18\n20:00\nAlaves\n0\n\n\n4\ns_21_22\n2021-09-22\n18:30\nAlaves\n0\n\n\n5\ns_21_22\n2021-09-25\n13:00\nAlaves\n1\n\n\n6\ns_21_22\n2021-10-01\n20:00\nAlaves\n0\n\n\n7\ns_21_22\n2021-10-18\n18:00\nAlaves\n0\n\n\n8\ns_21_22\n2021-10-23\n15:15\nAlaves\n2\n\n\n9\ns_21_22\n2021-10-26\n18:00\nAlaves\n1\n\n\n10\ns_21_22\n2021-10-30\n20:00\nAlaves\n1\n\n\n11\ns_21_22\n2021-11-06\n17:30\nAlaves\n2\n\n\n\n\n\n\n\n\n\n\nAs a check, we verify the number of games each team has played during the course of two seasons. In La Liga, 20 teams play 38 games each during the course of the season. At the end of the season 3 teams are relegated to the second division and 3 are promoted. Hence, over the course of two seasons there should be 17 teams that played both seasons and 6 teams that only played one season. The result of this count is shown in Table 3\n\n\n\n\nTable 3: Count of total games played by teams over two seasons\n\n\n\n\n\n\n\n\n\n\nn_games\nteam\n\n\n\n\n0\n38\n6\n\n\n1\n76\n17\n\n\n\n\n\n\n\n\n\n\nModel fitting consists in calculating for each team we the rolling mean over a period of previous 10 games. We have to ensure that the result of the current game is not used rolling mean calculation (if we didn’t we would have data leakage). The first estimate for the rolling mean will be for the 11th game. A sample of the model fitting results is shown in Table 4\n\n\n\n\nTable 4: Model fitting for the first twelve games of Alaves during the 2021-2022 season\n\n\n\n\n\n\n\n\n\n\nseason\ndate\ntime\nteam\ngoals\nma10\ngames_played\nseason_game\n\n\n\n\n0\ns_21_22\n2021-08-14\n21:00\nAlaves\n1\nNaN\n0\n1\n\n\n1\ns_21_22\n2021-08-21\n16:00\nAlaves\n0\nNaN\n1\n2\n\n\n2\ns_21_22\n2021-08-27\n21:15\nAlaves\n0\nNaN\n2\n3\n\n\n3\ns_21_22\n2021-09-18\n20:00\nAlaves\n0\nNaN\n3\n4\n\n\n4\ns_21_22\n2021-09-22\n18:30\nAlaves\n0\nNaN\n4\n5\n\n\n5\ns_21_22\n2021-09-25\n13:00\nAlaves\n1\nNaN\n5\n6\n\n\n6\ns_21_22\n2021-10-01\n20:00\nAlaves\n0\nNaN\n6\n7\n\n\n7\ns_21_22\n2021-10-18\n18:00\nAlaves\n0\nNaN\n7\n8\n\n\n8\ns_21_22\n2021-10-23\n15:15\nAlaves\n2\nNaN\n8\n9\n\n\n9\ns_21_22\n2021-10-26\n18:00\nAlaves\n1\nNaN\n9\n10\n\n\n10\ns_21_22\n2021-10-30\n20:00\nAlaves\n1\n0.5\n10\n11\n\n\n11\ns_21_22\n2021-11-06\n17:30\nAlaves\n2\n0.5\n11\n12\n\n\n\n\n\n\n\n\n\n\nThe ovarall results of model fitting can be visualized in Figure 1, a heatmap of the rate parameter for each team and for each week.\n\n\n\n\n\n\n\n\nFigure 1: Heatmap of rate parameter by team and season game\n\n\n\n\n\nThe teams are ordered by rows with the team that finished in the first place in the first row and so on. Each square on the grid is colored according to the value of the fitted rate parameter and the columns represent the number of games played, i.e. the column labeled 11 represents the eleventh game of each team. This will almost always correspond to the week of the season. Also, note that the first game for which we have a parameter is the eleventh game of each team since we chose an 10 games window for teh moving average\nTeams in the top rows have a higher rate parameter and also some teams that went on a scoring streak during the season. Amongst them we have Villareal at the start of the second leg and Levante at the end of the season."
+  },
+  {
+    "objectID": "posts/soccer-games-outcomes/index.html#generating-predictions",
+    "href": "posts/soccer-games-outcomes/index.html#generating-predictions",
+    "title": "Modeling the outcome of soccer games",
+    "section": "Generating predictions",
+    "text": "Generating predictions\nTo generate predictions we first attach the estimated rate parameters of the home team and of the away team for each game played in the season:\n\n\n\n\n\n\n\n\n\nht\nat\nftr\nhma10\nama10\n\n\n\n\n0\nValencia\nGetafe\nH\nNaN\nNaN\n\n\n1\nCadiz\nLevante\nD\nNaN\nNaN\n\n\n2\nMallorca\nBetis\nD\nNaN\nNaN\n\n\n3\nAlaves\nReal Madrid\nA\nNaN\nNaN\n\n\n4\nOsasuna\nEspanol\nD\nNaN\nNaN\n\n\n\n\n\n\n\nWe then generate (for each game) all possible results starting from 0-0 and up to 5-5, i.e. 36 possible scores for each game and assign the corresponding probability using the Poisson mass probability function\n\n\n\n\n\n\n\n\n\nht\nat\nfthg\nftag\nftr\nhma10\nama10\npred_hgoals\npred_agoals\nh_prob\na_prob\njoint_prob\n\n\n\n\n5833\nVillarreal\nVallecano\n2\n0\nH\n1.0\n1.4\n0\n1\n0.367879\n0.345236\n0.127005\n\n\n5839\nVillarreal\nVallecano\n2\n0\nH\n1.0\n1.4\n1\n1\n0.367879\n0.345236\n0.127005\n\n\n20419\nVillarreal\nVallecano\n0\n1\nA\n1.1\n1.4\n1\n1\n0.366158\n0.345236\n0.126411\n\n\n20413\nVillarreal\nVallecano\n0\n1\nA\n1.1\n1.4\n0\n1\n0.332871\n0.345236\n0.114919\n\n\n5832\nVillarreal\nVallecano\n2\n0\nH\n1.0\n1.4\n0\n0\n0.367879\n0.246597\n0.090718\n\n\n5838\nVillarreal\nVallecano\n2\n0\nH\n1.0\n1.4\n1\n0\n0.367879\n0.246597\n0.090718\n\n\n20418\nVillarreal\nVallecano\n0\n1\nA\n1.1\n1.4\n1\n0\n0.366158\n0.246597\n0.090293\n\n\n5834\nVillarreal\nVallecano\n2\n0\nH\n1.0\n1.4\n0\n2\n0.367879\n0.241665\n0.088904\n\n\n5840\nVillarreal\nVallecano\n2\n0\nH\n1.0\n1.4\n1\n2\n0.367879\n0.241665\n0.088904\n\n\n20420\nVillarreal\nVallecano\n0\n1\nA\n1.1\n1.4\n1\n2\n0.366158\n0.241665\n0.088488\n\n\n20412\nVillarreal\nVallecano\n0\n1\nA\n1.1\n1.4\n0\n0\n0.332871\n0.246597\n0.082085\n\n\n20414\nVillarreal\nVallecano\n0\n1\nA\n1.1\n1.4\n0\n2\n0.332871\n0.241665\n0.080443\n\n\n20425\nVillarreal\nVallecano\n0\n1\nA\n1.1\n1.4\n2\n1\n0.201387\n0.345236\n0.069526\n\n\n5845\nVillarreal\nVallecano\n2\n0\nH\n1.0\n1.4\n2\n1\n0.183940\n0.345236\n0.063503\n\n\n20424\nVillarreal\nVallecano\n0\n1\nA\n1.1\n1.4\n2\n0\n0.201387\n0.246597\n0.049661\n\n\n20426\nVillarreal\nVallecano\n0\n1\nA\n1.1\n1.4\n2\n2\n0.201387\n0.241665\n0.048668\n\n\n5844\nVillarreal\nVallecano\n2\n0\nH\n1.0\n1.4\n2\n0\n0.183940\n0.246597\n0.045359\n\n\n5846\nVillarreal\nVallecano\n2\n0\nH\n1.0\n1.4\n2\n2\n0.183940\n0.241665\n0.044452\n\n\n5835\nVillarreal\nVallecano\n2\n0\nH\n1.0\n1.4\n0\n3\n0.367879\n0.112777\n0.041488\n\n\n5841\nVillarreal\nVallecano\n2\n0\nH\n1.0\n1.4\n1\n3\n0.367879\n0.112777\n0.041488\n\n\n20421\nVillarreal\nVallecano\n0\n1\nA\n1.1\n1.4\n1\n3\n0.366158\n0.112777\n0.041294\n\n\n20415\nVillarreal\nVallecano\n0\n1\nA\n1.1\n1.4\n0\n3\n0.332871\n0.112777\n0.037540\n\n\n20431\nVillarreal\nVallecano\n0\n1\nA\n1.1\n1.4\n3\n1\n0.073842\n0.345236\n0.025493\n\n\n20427\nVillarreal\nVallecano\n0\n1\nA\n1.1\n1.4\n2\n3\n0.201387\n0.112777\n0.022712\n\n\n5851\nVillarreal\nVallecano\n2\n0\nH\n1.0\n1.4\n3\n1\n0.061313\n0.345236\n0.021168\n\n\n5847\nVillarreal\nVallecano\n2\n0\nH\n1.0\n1.4\n2\n3\n0.183940\n0.112777\n0.020744\n\n\n20430\nVillarreal\nVallecano\n0\n1\nA\n1.1\n1.4\n3\n0\n0.073842\n0.246597\n0.018209\n\n\n20432\nVillarreal\nVallecano\n0\n1\nA\n1.1\n1.4\n3\n2\n0.073842\n0.241665\n0.017845\n\n\n5850\nVillarreal\nVallecano\n2\n0\nH\n1.0\n1.4\n3\n0\n0.061313\n0.246597\n0.015120\n\n\n5852\nVillarreal\nVallecano\n2\n0\nH\n1.0\n1.4\n3\n2\n0.061313\n0.241665\n0.014817\n\n\n5836\nVillarreal\nVallecano\n2\n0\nH\n1.0\n1.4\n0\n4\n0.367879\n0.039472\n0.014521\n\n\n5842\nVillarreal\nVallecano\n2\n0\nH\n1.0\n1.4\n1\n4\n0.367879\n0.039472\n0.014521\n\n\n20422\nVillarreal\nVallecano\n0\n1\nA\n1.1\n1.4\n1\n4\n0.366158\n0.039472\n0.014453\n\n\n20416\nVillarreal\nVallecano\n0\n1\nA\n1.1\n1.4\n0\n4\n0.332871\n0.039472\n0.013139\n\n\n20433\nVillarreal\nVallecano\n0\n1\nA\n1.1\n1.4\n3\n3\n0.073842\n0.112777\n0.008328\n\n\n20428\nVillarreal\nVallecano\n0\n1\nA\n1.1\n1.4\n2\n4\n0.201387\n0.039472\n0.007949\n\n\n5848\nVillarreal\nVallecano\n2\n0\nH\n1.0\n1.4\n2\n4\n0.183940\n0.039472\n0.007260\n\n\n20437\nVillarreal\nVallecano\n0\n1\nA\n1.1\n1.4\n4\n1\n0.020307\n0.345236\n0.007011\n\n\n5853\nVillarreal\nVallecano\n2\n0\nH\n1.0\n1.4\n3\n3\n0.061313\n0.112777\n0.006915\n\n\n5857\nVillarreal\nVallecano\n2\n0\nH\n1.0\n1.4\n4\n1\n0.015328\n0.345236\n0.005292\n\n\n20436\nVillarreal\nVallecano\n0\n1\nA\n1.1\n1.4\n4\n0\n0.020307\n0.246597\n0.005008\n\n\n20438\nVillarreal\nVallecano\n0\n1\nA\n1.1\n1.4\n4\n2\n0.020307\n0.241665\n0.004907\n\n\n5837\nVillarreal\nVallecano\n2\n0\nH\n1.0\n1.4\n0\n5\n0.367879\n0.011052\n0.004066\n\n\n5843\nVillarreal\nVallecano\n2\n0\nH\n1.0\n1.4\n1\n5\n0.367879\n0.011052\n0.004066\n\n\n20423\nVillarreal\nVallecano\n0\n1\nA\n1.1\n1.4\n1\n5\n0.366158\n0.011052\n0.004047\n\n\n5856\nVillarreal\nVallecano\n2\n0\nH\n1.0\n1.4\n4\n0\n0.015328\n0.246597\n0.003780\n\n\n5858\nVillarreal\nVallecano\n2\n0\nH\n1.0\n1.4\n4\n2\n0.015328\n0.241665\n0.003704\n\n\n20417\nVillarreal\nVallecano\n0\n1\nA\n1.1\n1.4\n0\n5\n0.332871\n0.011052\n0.003679\n\n\n20434\nVillarreal\nVallecano\n0\n1\nA\n1.1\n1.4\n3\n4\n0.073842\n0.039472\n0.002915\n\n\n5854\nVillarreal\nVallecano\n2\n0\nH\n1.0\n1.4\n3\n4\n0.061313\n0.039472\n0.002420\n\n\n\n\n\n\n\n\n\nThe accuracy of the model is 0.3711 and the balanced accuracy is 0.3952"
+  },
+  {
+    "objectID": "posts/conformal-prediction/index.html",
+    "href": "posts/conformal-prediction/index.html",
+    "title": "What is … conformal prediction",
+    "section": "",
+    "text": "Conformal prediction is a machine learning framework for uncertainty quantification. It produces statistically valid prediction regions for any underlying point predictor only assuming exchangeability of the data [1]. This is in contrast to traditional point prediction frameworks, which provide a single best estimate for a target variable and often do not quantify the uncertainty associated with that estimate.\nConformal prediction was originally designed for an on-line setting in which labels are predicted successively, each one being revealed before the next is predicted. It requires a user-specified significance level for which the algorithm should produce its predictions. This significance level restricts the frequency of errors that the algorithm is allowed to make.\nFrom the blog post [2] some advantages of conformal prediction are:"
+  },
+  {
+    "objectID": "posts/conformal-prediction/index.html#references",
+    "href": "posts/conformal-prediction/index.html#references",
+    "title": "What is … conformal prediction",
+    "section": "References",
+    "text": "References\n\nConformal Prediction (Wikipedia)\nIntroduction To Conformal Prediction With Python\nConformal Prediction for Machine Learning Classification —From the Ground Up"
   }
 ]

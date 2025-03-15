@@ -1,0 +1,11 @@
+[
+  {
+    "listing": "/blog.html",
+    "items": [
+      "/posts/basic-causal-stuctures/index.html",
+      "/posts/conformal-prediction/index.html",
+      "/posts/eda-neighbours-graph/index.html",
+      "/posts/soccer-games-outcomes/index.html"
+    ]
+  }
+]
