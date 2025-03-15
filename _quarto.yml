@@ -4,18 +4,22 @@ project:
 website:
   title: "Rene Valenzuela"
   navbar:
-    left:
+    right:
       - href: index.qmd
         text: Home
-      - about.qmd
+      - href: /ml-blog/
+        text: Blog
+      - talks.qmd
+  page-footer: 
+    background: light
+    left: Copyright 2025, René Valenzuela
+    right: Thus website is built with [Quarto](https://quarto.org/){target=_blank}
 
 format:
   html:
     theme:
-      - cosmo
+      - yeti
       - brand
     css: styles.css
     toc: true
-
-
-
+    page-layout: full
