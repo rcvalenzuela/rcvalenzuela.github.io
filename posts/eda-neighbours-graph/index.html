@@ -257,7 +257,7 @@ s_{i,j} = \begin{cases} 1 &amp; d_{i,j \leq t_{1}} \\ 0.5 &amp; t_{1} &lt; d_{i,
 </section>
 <section id="implementation-of-similarity" class="level1">
 <h1>Implementation of similarity</h1>
-<div id="394d4dda" class="cell" data-execution_count="2">
+<div id="a8166443" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> sim_score(x:pd.Series, uid:pd.Series, t1<span class="op">=</span><span class="va">None</span>, t2<span class="op">=</span><span class="va">None</span>):</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""</span></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="co">    </span></span>
@@ -282,7 +282,7 @@ s_{i,j} = \begin{cases} 1 &amp; d_{i,j \leq t_{1}} \\ 0.5 &amp; t_{1} &lt; d_{i,
 <span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>        res <span class="op">=</span> _sim_cont_score(x, uid, t1, t2)</span>
 <span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> res</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div id="5cc57f35" class="cell" data-execution_count="3">
+<div id="4836d588" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> _sim_cont_score(x:pd.Series, uid:pd.Series, t1:<span class="bu">float</span>, t2:<span class="bu">float</span>) <span class="op">-&gt;</span> pd.DataFrame:</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Compute similarity score for a continuous variable</span></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -353,7 +353,7 @@ s_{i,j} = \begin{cases} 1 &amp; d_{i,j \leq t_{1}} \\ 0.5 &amp; t_{1} &lt; d_{i,
 <span id="cb2-68"><a href="#cb2-68" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-69"><a href="#cb2-69" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> res.loc[res.sim <span class="op">&gt;</span> <span class="dv">0</span>, [<span class="st">'src'</span>, <span class="st">'dest'</span>, <span class="st">'sim'</span>]]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div id="b2cc49b4" class="cell" data-execution_count="4">
+<div id="a32dd7f6" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> _sim_nom_score(x:pd.Series, uid:pd.Series):</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""</span></span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -400,7 +400,7 @@ s_{i,j} = \begin{cases} 1 &amp; d_{i,j \leq t_{1}} \\ 0.5 &amp; t_{1} &lt; d_{i,
 <span id="cb3-44"><a href="#cb3-44" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-45"><a href="#cb3-45" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> res.loc[res.sim <span class="op">&gt;</span> <span class="dv">0</span>, [<span class="st">'src'</span>, <span class="st">'dest'</span>, <span class="st">'sim'</span>]]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div id="5152a15f" class="cell" data-execution_count="5">
+<div id="80f19003" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> _sim_ord_score(x:pd.Series, uid:pd.Series):</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""</span></span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="co">    Notes</span></span>
@@ -414,7 +414,7 @@ s_{i,j} = \begin{cases} 1 &amp; d_{i,j \leq t_{1}} \\ 0.5 &amp; t_{1} &lt; d_{i,
 <span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> res</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div id="313b057d" class="cell" data-execution_count="6">
+<div id="7c1ac20b" class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Simple example dataframe</span></span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>simple_test <span class="op">=</span> pd.DataFrame({</span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">'cont_x'</span>:[<span class="dv">1</span>, np.nan, <span class="dv">3</span>, <span class="dv">7</span>, np.nan], </span>
@@ -464,7 +464,7 @@ s_{i,j} = \begin{cases} 1 &amp; d_{i,j \leq t_{1}} \\ 0.5 &amp; t_{1} &lt; d_{i,
 </div>
 </div>
 </div>
-<div id="7cd88c19" class="cell" data-execution_count="7">
+<div id="9b577eed" class="cell" data-execution_count="7">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Calculate the similarity for the instances on this feature</span></span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>sim <span class="op">=</span> sim_score(simple_test.cont_x, simple_test.index, <span class="dv">3</span>, <span class="dv">5</span>)</span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>sim</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -506,7 +506,7 @@ s_{i,j} = \begin{cases} 1 &amp; d_{i,j \leq t_{1}} \\ 0.5 &amp; t_{1} &lt; d_{i,
 </div>
 </div>
 </div>
-<div id="22b1f6b6" class="cell" data-execution_count="8">
+<div id="b1fcbfa1" class="cell" data-execution_count="8">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Calculate the similarity for the instances on this feature</span></span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>sim <span class="op">=</span> sim_score(simple_test.bin_x, simple_test.index)</span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>sim</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -546,7 +546,7 @@ s_{i,j} = \begin{cases} 1 &amp; d_{i,j \leq t_{1}} \\ 0.5 &amp; t_{1} &lt; d_{i,
 <section id="example-titanic-dataset" class="level1">
 <h1>Example: Titanic dataset</h1>
 <p>The first observations of the titanic dataset are shown below,</p>
-<div id="7aee7641" class="cell" data-execution_count="10">
+<div id="74f8f14b" class="cell" data-execution_count="10">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>raw_df.head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="10">
 <div>
@@ -652,7 +652,7 @@ s_{i,j} = \begin{cases} 1 &amp; d_{i,j \leq t_{1}} \\ 0.5 &amp; t_{1} &lt; d_{i,
 </div>
 </div>
 </div>
-<div id="b1c0a75c" class="cell" data-execution_count="11">
+<div id="7dcd84ea" class="cell" data-execution_count="11">
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>raw_df.dtypes</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="11">
 <pre><code>passengerid       int64
@@ -671,7 +671,7 @@ dtype: object</code></pre>
 </div>
 </div>
 <p>We can classify each of the features according to both their usage in a model and their type</p>
-<div id="670b10aa" class="cell" data-execution_count="12">
+<div id="012a2454" class="cell" data-execution_count="12">
 <div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>index_cols <span class="op">=</span> [<span class="st">'passengerid'</span>]</span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>tgt_col <span class="op">=</span> [<span class="st">'survived'</span>]</span>
 <span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>bin_cols <span class="op">=</span> [<span class="st">'sex'</span>]</span>
@@ -681,7 +681,7 @@ dtype: object</code></pre>
 </div>
 <section id="sex" class="level2">
 <h2 class="anchored" data-anchor-id="sex">Sex</h2>
-<div id="18f678a3" class="cell" data-execution_count="13">
+<div id="ddc7b569" class="cell" data-execution_count="13">
 <div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Find neighbours based on sex</span></span>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>sex_nbh <span class="op">=</span> sim_score(raw_df.sex, raw_df.passengerid)</span>
 <span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>sex_nbh <span class="op">=</span> sex_nbh.rename(columns<span class="op">=</span>{<span class="st">'sim'</span>:<span class="st">'weight'</span>})</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -689,12 +689,12 @@ dtype: object</code></pre>
 </section>
 <section id="passenger-class" class="level2">
 <h2 class="anchored" data-anchor-id="passenger-class">Passenger class</h2>
-<div id="151d6567" class="cell" data-execution_count="14">
+<div id="a30541d0" class="cell" data-execution_count="14">
 <div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Find neighbours based on passenger class</span></span>
 <span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>pclass_nbh <span class="op">=</span> sim_score(raw_df.pclass, raw_df.passengerid)</span>
 <span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>pclass_nbh <span class="op">=</span> pclass_nbh.rename(columns<span class="op">=</span>{<span class="st">'sim'</span>:<span class="st">'weight'</span>})</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div id="92f1c186" class="cell" data-execution_count="15">
+<div id="fa931e3b" class="cell" data-execution_count="15">
 <div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Find neighbours based on passenger class</span></span>
 <span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="co">#nbh_cols = ['pclass']</span></span>
 <span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a><span class="co">#pclass_nbh = raw_df[index_cols + nbh_cols].copy()</span></span>
@@ -706,7 +706,7 @@ dtype: object</code></pre>
 </section>
 <section id="sibsp" class="level2">
 <h2 class="anchored" data-anchor-id="sibsp">Sibsp</h2>
-<div id="9cb5b1d2" class="cell" data-execution_count="16">
+<div id="4a6a64fc" class="cell" data-execution_count="16">
 <div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>raw_df[<span class="st">'sibsp'</span>].value_counts().to_frame().reset_index()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="16">
 <div>
@@ -770,7 +770,7 @@ dtype: object</code></pre>
 <li>3: 2, 3, 4</li>
 <li>4: &gt;= 4</li>
 </ul>
-<div id="d52aaf25" class="cell" data-execution_count="17">
+<div id="25ee51f0" class="cell" data-execution_count="17">
 <div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>nbh_cols <span class="op">=</span> [<span class="st">'sibsp'</span>]</span>
 <span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>sibsp_nbh <span class="op">=</span> raw_df[index_cols <span class="op">+</span> nbh_cols].copy()</span>
 <span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -792,7 +792,7 @@ dtype: object</code></pre>
 </section>
 <section id="generate-neighbours-overall-edges" class="level2">
 <h2 class="anchored" data-anchor-id="generate-neighbours-overall-edges">Generate neighbours overall edges</h2>
-<div id="dee45f30" class="cell" data-execution_count="18">
+<div id="9c6eb560" class="cell" data-execution_count="18">
 <div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Add neighbours edges between every </span></span>
 <span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>nbh_edges <span class="op">=</span> pd.concat([sex_nbh, pclass_nbh])</span>
 <span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>nbh_edges <span class="op">=</span> nbh_edges.groupby([<span class="st">'src'</span>, <span class="st">'dest'</span>]).<span class="bu">sum</span>().reset_index()</span>
@@ -801,7 +801,7 @@ dtype: object</code></pre>
 <span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>n_feats <span class="op">=</span> <span class="dv">2</span></span>
 <span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>nbh_edges <span class="op">=</span> nbh_edges.loc[nbh_edges.weight <span class="op">==</span> n_feats]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div id="0a8ecf58" class="cell" data-execution_count="19">
+<div id="62bcb387" class="cell" data-execution_count="19">
 <div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create the graph</span></span>
 <span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>nbh_nodes <span class="op">=</span> <span class="bu">list</span>(raw_df.passengerid.unique())</span>
 <span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>nd_color <span class="op">=</span> [<span class="st">'red'</span> <span class="cf">if</span> surv <span class="op">==</span> <span class="dv">1</span> <span class="cf">else</span> <span class="st">'blue'</span> <span class="cf">for</span> surv <span class="kw">in</span> raw_df.survived]</span>
@@ -813,7 +813,7 @@ dtype: object</code></pre>
 </section>
 <section id="compute-connected-components" class="level2">
 <h2 class="anchored" data-anchor-id="compute-connected-components">Compute connected components</h2>
-<div id="6a5707de" class="cell" data-execution_count="20">
+<div id="e0031625" class="cell" data-execution_count="20">
 <div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>conn_comp <span class="op">=</span> nx.connected_components(nbh)</span>
 <span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>dfs <span class="op">=</span> <span class="bu">list</span>()</span>
 <span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>idx <span class="op">=</span> <span class="dv">0</span></span>
@@ -823,7 +823,7 @@ dtype: object</code></pre>
 <span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a>nbh_tgt <span class="op">=</span> pd.concat(dfs).sort_values(<span class="st">'passengerid'</span>)</span>
 <span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a>nbh_tgt <span class="op">=</span> nbh_tgt.merge(raw_df[index_cols <span class="op">+</span> tgt_col], on<span class="op">=</span><span class="st">'passengerid'</span>, how<span class="op">=</span><span class="st">'left'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div id="d20079a8" class="cell" data-execution_count="21">
+<div id="e64655b9" class="cell" data-execution_count="21">
 <div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>nbh_tgt.groupby(<span class="st">'conn_comp_idx'</span>).agg({<span class="st">'survived'</span>: [<span class="st">'count'</span>, <span class="st">'sum'</span>, <span class="st">'mean'</span>]})</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="21">
 <div>
@@ -894,7 +894,7 @@ dtype: object</code></pre>
 </section>
 <section id="visualization" class="level2">
 <h2 class="anchored" data-anchor-id="visualization">Visualization</h2>
-<div id="f8424a72" class="cell" data-execution_count="22">
+<div id="8cde411b" class="cell" data-execution_count="22">
 <div class="sourceCode cell-code" id="cb21"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create the graph visualization</span></span>
 <span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>plot_options <span class="op">=</span> {<span class="st">"node_size"</span>: <span class="dv">10</span>, <span class="st">"with_labels"</span>: <span class="va">False</span>, <span class="st">"width"</span>: <span class="fl">0.15</span>}</span>
 <span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>pos <span class="op">=</span> nx.spring_layout(nbh, iterations<span class="op">=</span><span class="dv">15</span>, seed<span class="op">=</span><span class="dv">1721</span>)</span>

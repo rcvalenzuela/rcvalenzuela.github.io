@@ -2,10 +2,10 @@
   {
     "listing": "/blog.html",
     "items": [
+      "/posts/soccer-games-outcomes/index.html",
       "/posts/basic-causal-stuctures/index.html",
-      "/posts/conformal-prediction/index.html",
       "/posts/eda-neighbours-graph/index.html",
-      "/posts/soccer-games-outcomes/index.html"
+      "/posts/conformal-prediction/index.html"
     ]
   }
 ]

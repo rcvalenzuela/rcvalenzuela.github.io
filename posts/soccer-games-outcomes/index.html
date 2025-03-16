@@ -152,7 +152,7 @@ window.Quarto = {
   <ul>
   <li><a href="#introduction" id="toc-introduction" class="nav-link active" data-scroll-target="#introduction">Introduction</a></li>
   <li><a href="#dataset" id="toc-dataset" class="nav-link" data-scroll-target="#dataset">Dataset</a></li>
-  <li><a href="#model-independent-poisson-models" id="toc-model-independent-poisson-models" class="nav-link" data-scroll-target="#model-independent-poisson-models">Model: Independent Poisson models</a>
+  <li><a href="#model-1-independent-poisson-of-number-of-goals-scored-by-team" id="toc-model-1-independent-poisson-of-number-of-goals-scored-by-team" class="nav-link" data-scroll-target="#model-1-independent-poisson-of-number-of-goals-scored-by-team">Model 1: Independent Poisson of number of goals scored by team</a>
   <ul class="collapse">
   <li><a href="#high-level-approach" id="toc-high-level-approach" class="nav-link" data-scroll-target="#high-level-approach">High level approach</a></li>
   <li><a href="#hashing-out-the-details" id="toc-hashing-out-the-details" class="nav-link" data-scroll-target="#hashing-out-the-details">Hashing out the details</a>
@@ -162,7 +162,6 @@ window.Quarto = {
   <li><a href="#implementation" id="toc-implementation" class="nav-link" data-scroll-target="#implementation">Implementation</a></li>
   <li><a href="#generating-predictions" id="toc-generating-predictions" class="nav-link" data-scroll-target="#generating-predictions">Generating predictions</a></li>
   </ul></li>
-  <li><a href="#model-random-forest-of-home-and-away-goal-rates" id="toc-model-random-forest-of-home-and-away-goal-rates" class="nav-link" data-scroll-target="#model-random-forest-of-home-and-away-goal-rates">Model: Random forest of home and away goal rates</a></li>
   </ul>
 </nav>
     </div>
@@ -198,7 +197,7 @@ window.Quarto = {
     <div>
     <div class="quarto-title-meta-heading">Modified</div>
     <div class="quarto-title-meta-contents">
-      <p class="date-modified">July 26, 2024</p>
+      <p class="date-modified">March 16, 2025</p>
     </div>
   </div>
     
@@ -211,8 +210,7 @@ window.Quarto = {
 
 <!--
 TODO:
-- Why are some duplicates in games_to_predict_all_res?
-- Add a scatter plot of hma10 versus ama10 ... label by result
+- Add custom (google) font to plots
 -->
 <section id="introduction" class="level1">
 <h1>Introduction</h1>
@@ -313,8 +311,8 @@ Table&nbsp;1: Input dataset. Results of the 21-22 La Liga season
 </div>
 <p>where <code>fthg</code> stands for full-time home team goals, <code>ftag</code> stands for full-time away team goals and <code>ftr</code> stands for full-time result which can take values <code>H</code> if the game ends in a win for the home team, <code>A</code> if the game ends in a win for the away team or <code>D</code> if the game ends in a draw.</p>
 </section>
-<section id="model-independent-poisson-models" class="level1">
-<h1>Model: Independent Poisson models</h1>
+<section id="model-1-independent-poisson-of-number-of-goals-scored-by-team" class="level1">
+<h1>Model 1: Independent Poisson of number of goals scored by team</h1>
 <section id="high-level-approach" class="level2">
 <h2 class="anchored" data-anchor-id="high-level-approach">High level approach</h2>
 <ul>
@@ -330,7 +328,7 @@ Table&nbsp;1: Input dataset. Results of the 21-22 La Liga season
 <h2 class="anchored" data-anchor-id="hashing-out-the-details">Hashing out the details</h2>
 <section id="fitting-the-poisson-model" class="level3">
 <h3 class="anchored" data-anchor-id="fitting-the-poisson-model">Fitting the Poisson model</h3>
-<p>The probability mass function of a Poisson distributed random variable <span class="math inline">\(X\)</span> is: <span class="math display">\[
+<p>The probability mass function of a <a href="https://en.wikipedia.org/wiki/Poisson_distribution">Poisson distributed random variable</a> <span class="math inline">\(X\)</span> is: <span class="math display">\[
 \begin{equation*}
 p_{X}(k) = \mathbb{P}\text{r}\left(X = k\right) = e^{-\lambda}\frac{\lambda^{k}}{k!}
 \end{equation*}
@@ -513,7 +511,7 @@ Table&nbsp;3: Count of total games played by teams over two seasons
 </figure>
 </div>
 </div>
-<p>Model fitting consists in calculating for each team we the rolling mean over a period of previous 10 games. We have to ensure that the result of the current game is not used rolling mean calculation (if we didn’t we would have data leakage). The first estimate for the rolling mean will be for the 11th game. A sample of the model fitting results is shown in <a href="#tbl-fit-alaves" class="quarto-xref">Table&nbsp;4</a></p>
+<p>Model fitting consists in calculating for each team the rolling mean over a period of previous 10 games. We have to ensure that the result of the current game is not used rolling mean calculation (if we didn’t we would have data leakage). The first estimate for the rolling mean will be for the 11th game. A sample of the model fitting results is shown in <a href="#tbl-fit-alaves" class="quarto-xref">Table&nbsp;4</a></p>
 <div class="cell" data-execution_count="12">
 <div id="tbl-fit-alaves" class="cell quarto-float quarto-figure quarto-figure-center anchored" data-execution_count="12">
 <figure class="quarto-float quarto-float-tbl figure">
@@ -702,7 +700,7 @@ Figure&nbsp;1: Heatmap of rate parameter by team and season game
 <section id="generating-predictions" class="level2">
 <h2 class="anchored" data-anchor-id="generating-predictions">Generating predictions</h2>
 <p>To generate predictions we first attach the estimated rate parameters of the home team and of the away team for each game played in the season:</p>
-<div id="0ed7a64d" class="cell" data-execution_count="16">
+<div id="484829fb" class="cell" data-execution_count="16">
 <div class="cell-output cell-output-display" data-execution_count="16">
 <div>
 
@@ -711,6 +709,7 @@ Figure&nbsp;1: Heatmap of rate parameter by team and season game
 <thead>
 <tr class="header">
 <th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">season</th>
 <th data-quarto-table-cell-role="th">ht</th>
 <th data-quarto-table-cell-role="th">at</th>
 <th data-quarto-table-cell-role="th">ftr</th>
@@ -721,6 +720,7 @@ Figure&nbsp;1: Heatmap of rate parameter by team and season game
 <tbody>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">0</td>
+<td>s_21_22</td>
 <td>Valencia</td>
 <td>Getafe</td>
 <td>H</td>
@@ -729,6 +729,7 @@ Figure&nbsp;1: Heatmap of rate parameter by team and season game
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">1</td>
+<td>s_21_22</td>
 <td>Cadiz</td>
 <td>Levante</td>
 <td>D</td>
@@ -737,6 +738,7 @@ Figure&nbsp;1: Heatmap of rate parameter by team and season game
 </tr>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">2</td>
+<td>s_21_22</td>
 <td>Mallorca</td>
 <td>Betis</td>
 <td>D</td>
@@ -745,6 +747,7 @@ Figure&nbsp;1: Heatmap of rate parameter by team and season game
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">3</td>
+<td>s_21_22</td>
 <td>Alaves</td>
 <td>Real Madrid</td>
 <td>A</td>
@@ -753,6 +756,7 @@ Figure&nbsp;1: Heatmap of rate parameter by team and season game
 </tr>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">4</td>
+<td>s_21_22</td>
 <td>Osasuna</td>
 <td>Espanol</td>
 <td>D</td>
@@ -766,797 +770,32 @@ Figure&nbsp;1: Heatmap of rate parameter by team and season game
 </div>
 </div>
 <p>We then generate (for each game) all possible results starting from 0-0 and up to 5-5, i.e.&nbsp;36 possible scores for each game and assign the corresponding probability using the Poisson mass probability function</p>
-<div id="c0857af5" class="cell" data-execution_count="19">
-<div class="cell-output cell-output-display" data-execution_count="19">
-<div>
-
-
-<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
-<thead>
-<tr class="header">
-<th data-quarto-table-cell-role="th"></th>
-<th data-quarto-table-cell-role="th">ht</th>
-<th data-quarto-table-cell-role="th">at</th>
-<th data-quarto-table-cell-role="th">fthg</th>
-<th data-quarto-table-cell-role="th">ftag</th>
-<th data-quarto-table-cell-role="th">ftr</th>
-<th data-quarto-table-cell-role="th">hma10</th>
-<th data-quarto-table-cell-role="th">ama10</th>
-<th data-quarto-table-cell-role="th">pred_hgoals</th>
-<th data-quarto-table-cell-role="th">pred_agoals</th>
-<th data-quarto-table-cell-role="th">h_prob</th>
-<th data-quarto-table-cell-role="th">a_prob</th>
-<th data-quarto-table-cell-role="th">joint_prob</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">5833</td>
-<td>Villarreal</td>
-<td>Vallecano</td>
-<td>2</td>
-<td>0</td>
-<td>H</td>
-<td>1.0</td>
-<td>1.4</td>
-<td>0</td>
-<td>1</td>
-<td>0.367879</td>
-<td>0.345236</td>
-<td>0.127005</td>
-</tr>
-<tr class="even">
-<td data-quarto-table-cell-role="th">5839</td>
-<td>Villarreal</td>
-<td>Vallecano</td>
-<td>2</td>
-<td>0</td>
-<td>H</td>
-<td>1.0</td>
-<td>1.4</td>
-<td>1</td>
-<td>1</td>
-<td>0.367879</td>
-<td>0.345236</td>
-<td>0.127005</td>
-</tr>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">20419</td>
-<td>Villarreal</td>
-<td>Vallecano</td>
-<td>0</td>
-<td>1</td>
-<td>A</td>
-<td>1.1</td>
-<td>1.4</td>
-<td>1</td>
-<td>1</td>
-<td>0.366158</td>
-<td>0.345236</td>
-<td>0.126411</td>
-</tr>
-<tr class="even">
-<td data-quarto-table-cell-role="th">20413</td>
-<td>Villarreal</td>
-<td>Vallecano</td>
-<td>0</td>
-<td>1</td>
-<td>A</td>
-<td>1.1</td>
-<td>1.4</td>
-<td>0</td>
-<td>1</td>
-<td>0.332871</td>
-<td>0.345236</td>
-<td>0.114919</td>
-</tr>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">5832</td>
-<td>Villarreal</td>
-<td>Vallecano</td>
-<td>2</td>
-<td>0</td>
-<td>H</td>
-<td>1.0</td>
-<td>1.4</td>
-<td>0</td>
-<td>0</td>
-<td>0.367879</td>
-<td>0.246597</td>
-<td>0.090718</td>
-</tr>
-<tr class="even">
-<td data-quarto-table-cell-role="th">5838</td>
-<td>Villarreal</td>
-<td>Vallecano</td>
-<td>2</td>
-<td>0</td>
-<td>H</td>
-<td>1.0</td>
-<td>1.4</td>
-<td>1</td>
-<td>0</td>
-<td>0.367879</td>
-<td>0.246597</td>
-<td>0.090718</td>
-</tr>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">20418</td>
-<td>Villarreal</td>
-<td>Vallecano</td>
-<td>0</td>
-<td>1</td>
-<td>A</td>
-<td>1.1</td>
-<td>1.4</td>
-<td>1</td>
-<td>0</td>
-<td>0.366158</td>
-<td>0.246597</td>
-<td>0.090293</td>
-</tr>
-<tr class="even">
-<td data-quarto-table-cell-role="th">5834</td>
-<td>Villarreal</td>
-<td>Vallecano</td>
-<td>2</td>
-<td>0</td>
-<td>H</td>
-<td>1.0</td>
-<td>1.4</td>
-<td>0</td>
-<td>2</td>
-<td>0.367879</td>
-<td>0.241665</td>
-<td>0.088904</td>
-</tr>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">5840</td>
-<td>Villarreal</td>
-<td>Vallecano</td>
-<td>2</td>
-<td>0</td>
-<td>H</td>
-<td>1.0</td>
-<td>1.4</td>
-<td>1</td>
-<td>2</td>
-<td>0.367879</td>
-<td>0.241665</td>
-<td>0.088904</td>
-</tr>
-<tr class="even">
-<td data-quarto-table-cell-role="th">20420</td>
-<td>Villarreal</td>
-<td>Vallecano</td>
-<td>0</td>
-<td>1</td>
-<td>A</td>
-<td>1.1</td>
-<td>1.4</td>
-<td>1</td>
-<td>2</td>
-<td>0.366158</td>
-<td>0.241665</td>
-<td>0.088488</td>
-</tr>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">20412</td>
-<td>Villarreal</td>
-<td>Vallecano</td>
-<td>0</td>
-<td>1</td>
-<td>A</td>
-<td>1.1</td>
-<td>1.4</td>
-<td>0</td>
-<td>0</td>
-<td>0.332871</td>
-<td>0.246597</td>
-<td>0.082085</td>
-</tr>
-<tr class="even">
-<td data-quarto-table-cell-role="th">20414</td>
-<td>Villarreal</td>
-<td>Vallecano</td>
-<td>0</td>
-<td>1</td>
-<td>A</td>
-<td>1.1</td>
-<td>1.4</td>
-<td>0</td>
-<td>2</td>
-<td>0.332871</td>
-<td>0.241665</td>
-<td>0.080443</td>
-</tr>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">20425</td>
-<td>Villarreal</td>
-<td>Vallecano</td>
-<td>0</td>
-<td>1</td>
-<td>A</td>
-<td>1.1</td>
-<td>1.4</td>
-<td>2</td>
-<td>1</td>
-<td>0.201387</td>
-<td>0.345236</td>
-<td>0.069526</td>
-</tr>
-<tr class="even">
-<td data-quarto-table-cell-role="th">5845</td>
-<td>Villarreal</td>
-<td>Vallecano</td>
-<td>2</td>
-<td>0</td>
-<td>H</td>
-<td>1.0</td>
-<td>1.4</td>
-<td>2</td>
-<td>1</td>
-<td>0.183940</td>
-<td>0.345236</td>
-<td>0.063503</td>
-</tr>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">20424</td>
-<td>Villarreal</td>
-<td>Vallecano</td>
-<td>0</td>
-<td>1</td>
-<td>A</td>
-<td>1.1</td>
-<td>1.4</td>
-<td>2</td>
-<td>0</td>
-<td>0.201387</td>
-<td>0.246597</td>
-<td>0.049661</td>
-</tr>
-<tr class="even">
-<td data-quarto-table-cell-role="th">20426</td>
-<td>Villarreal</td>
-<td>Vallecano</td>
-<td>0</td>
-<td>1</td>
-<td>A</td>
-<td>1.1</td>
-<td>1.4</td>
-<td>2</td>
-<td>2</td>
-<td>0.201387</td>
-<td>0.241665</td>
-<td>0.048668</td>
-</tr>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">5844</td>
-<td>Villarreal</td>
-<td>Vallecano</td>
-<td>2</td>
-<td>0</td>
-<td>H</td>
-<td>1.0</td>
-<td>1.4</td>
-<td>2</td>
-<td>0</td>
-<td>0.183940</td>
-<td>0.246597</td>
-<td>0.045359</td>
-</tr>
-<tr class="even">
-<td data-quarto-table-cell-role="th">5846</td>
-<td>Villarreal</td>
-<td>Vallecano</td>
-<td>2</td>
-<td>0</td>
-<td>H</td>
-<td>1.0</td>
-<td>1.4</td>
-<td>2</td>
-<td>2</td>
-<td>0.183940</td>
-<td>0.241665</td>
-<td>0.044452</td>
-</tr>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">5835</td>
-<td>Villarreal</td>
-<td>Vallecano</td>
-<td>2</td>
-<td>0</td>
-<td>H</td>
-<td>1.0</td>
-<td>1.4</td>
-<td>0</td>
-<td>3</td>
-<td>0.367879</td>
-<td>0.112777</td>
-<td>0.041488</td>
-</tr>
-<tr class="even">
-<td data-quarto-table-cell-role="th">5841</td>
-<td>Villarreal</td>
-<td>Vallecano</td>
-<td>2</td>
-<td>0</td>
-<td>H</td>
-<td>1.0</td>
-<td>1.4</td>
-<td>1</td>
-<td>3</td>
-<td>0.367879</td>
-<td>0.112777</td>
-<td>0.041488</td>
-</tr>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">20421</td>
-<td>Villarreal</td>
-<td>Vallecano</td>
-<td>0</td>
-<td>1</td>
-<td>A</td>
-<td>1.1</td>
-<td>1.4</td>
-<td>1</td>
-<td>3</td>
-<td>0.366158</td>
-<td>0.112777</td>
-<td>0.041294</td>
-</tr>
-<tr class="even">
-<td data-quarto-table-cell-role="th">20415</td>
-<td>Villarreal</td>
-<td>Vallecano</td>
-<td>0</td>
-<td>1</td>
-<td>A</td>
-<td>1.1</td>
-<td>1.4</td>
-<td>0</td>
-<td>3</td>
-<td>0.332871</td>
-<td>0.112777</td>
-<td>0.037540</td>
-</tr>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">20431</td>
-<td>Villarreal</td>
-<td>Vallecano</td>
-<td>0</td>
-<td>1</td>
-<td>A</td>
-<td>1.1</td>
-<td>1.4</td>
-<td>3</td>
-<td>1</td>
-<td>0.073842</td>
-<td>0.345236</td>
-<td>0.025493</td>
-</tr>
-<tr class="even">
-<td data-quarto-table-cell-role="th">20427</td>
-<td>Villarreal</td>
-<td>Vallecano</td>
-<td>0</td>
-<td>1</td>
-<td>A</td>
-<td>1.1</td>
-<td>1.4</td>
-<td>2</td>
-<td>3</td>
-<td>0.201387</td>
-<td>0.112777</td>
-<td>0.022712</td>
-</tr>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">5851</td>
-<td>Villarreal</td>
-<td>Vallecano</td>
-<td>2</td>
-<td>0</td>
-<td>H</td>
-<td>1.0</td>
-<td>1.4</td>
-<td>3</td>
-<td>1</td>
-<td>0.061313</td>
-<td>0.345236</td>
-<td>0.021168</td>
-</tr>
-<tr class="even">
-<td data-quarto-table-cell-role="th">5847</td>
-<td>Villarreal</td>
-<td>Vallecano</td>
-<td>2</td>
-<td>0</td>
-<td>H</td>
-<td>1.0</td>
-<td>1.4</td>
-<td>2</td>
-<td>3</td>
-<td>0.183940</td>
-<td>0.112777</td>
-<td>0.020744</td>
-</tr>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">20430</td>
-<td>Villarreal</td>
-<td>Vallecano</td>
-<td>0</td>
-<td>1</td>
-<td>A</td>
-<td>1.1</td>
-<td>1.4</td>
-<td>3</td>
-<td>0</td>
-<td>0.073842</td>
-<td>0.246597</td>
-<td>0.018209</td>
-</tr>
-<tr class="even">
-<td data-quarto-table-cell-role="th">20432</td>
-<td>Villarreal</td>
-<td>Vallecano</td>
-<td>0</td>
-<td>1</td>
-<td>A</td>
-<td>1.1</td>
-<td>1.4</td>
-<td>3</td>
-<td>2</td>
-<td>0.073842</td>
-<td>0.241665</td>
-<td>0.017845</td>
-</tr>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">5850</td>
-<td>Villarreal</td>
-<td>Vallecano</td>
-<td>2</td>
-<td>0</td>
-<td>H</td>
-<td>1.0</td>
-<td>1.4</td>
-<td>3</td>
-<td>0</td>
-<td>0.061313</td>
-<td>0.246597</td>
-<td>0.015120</td>
-</tr>
-<tr class="even">
-<td data-quarto-table-cell-role="th">5852</td>
-<td>Villarreal</td>
-<td>Vallecano</td>
-<td>2</td>
-<td>0</td>
-<td>H</td>
-<td>1.0</td>
-<td>1.4</td>
-<td>3</td>
-<td>2</td>
-<td>0.061313</td>
-<td>0.241665</td>
-<td>0.014817</td>
-</tr>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">5836</td>
-<td>Villarreal</td>
-<td>Vallecano</td>
-<td>2</td>
-<td>0</td>
-<td>H</td>
-<td>1.0</td>
-<td>1.4</td>
-<td>0</td>
-<td>4</td>
-<td>0.367879</td>
-<td>0.039472</td>
-<td>0.014521</td>
-</tr>
-<tr class="even">
-<td data-quarto-table-cell-role="th">5842</td>
-<td>Villarreal</td>
-<td>Vallecano</td>
-<td>2</td>
-<td>0</td>
-<td>H</td>
-<td>1.0</td>
-<td>1.4</td>
-<td>1</td>
-<td>4</td>
-<td>0.367879</td>
-<td>0.039472</td>
-<td>0.014521</td>
-</tr>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">20422</td>
-<td>Villarreal</td>
-<td>Vallecano</td>
-<td>0</td>
-<td>1</td>
-<td>A</td>
-<td>1.1</td>
-<td>1.4</td>
-<td>1</td>
-<td>4</td>
-<td>0.366158</td>
-<td>0.039472</td>
-<td>0.014453</td>
-</tr>
-<tr class="even">
-<td data-quarto-table-cell-role="th">20416</td>
-<td>Villarreal</td>
-<td>Vallecano</td>
-<td>0</td>
-<td>1</td>
-<td>A</td>
-<td>1.1</td>
-<td>1.4</td>
-<td>0</td>
-<td>4</td>
-<td>0.332871</td>
-<td>0.039472</td>
-<td>0.013139</td>
-</tr>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">20433</td>
-<td>Villarreal</td>
-<td>Vallecano</td>
-<td>0</td>
-<td>1</td>
-<td>A</td>
-<td>1.1</td>
-<td>1.4</td>
-<td>3</td>
-<td>3</td>
-<td>0.073842</td>
-<td>0.112777</td>
-<td>0.008328</td>
-</tr>
-<tr class="even">
-<td data-quarto-table-cell-role="th">20428</td>
-<td>Villarreal</td>
-<td>Vallecano</td>
-<td>0</td>
-<td>1</td>
-<td>A</td>
-<td>1.1</td>
-<td>1.4</td>
-<td>2</td>
-<td>4</td>
-<td>0.201387</td>
-<td>0.039472</td>
-<td>0.007949</td>
-</tr>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">5848</td>
-<td>Villarreal</td>
-<td>Vallecano</td>
-<td>2</td>
-<td>0</td>
-<td>H</td>
-<td>1.0</td>
-<td>1.4</td>
-<td>2</td>
-<td>4</td>
-<td>0.183940</td>
-<td>0.039472</td>
-<td>0.007260</td>
-</tr>
-<tr class="even">
-<td data-quarto-table-cell-role="th">20437</td>
-<td>Villarreal</td>
-<td>Vallecano</td>
-<td>0</td>
-<td>1</td>
-<td>A</td>
-<td>1.1</td>
-<td>1.4</td>
-<td>4</td>
-<td>1</td>
-<td>0.020307</td>
-<td>0.345236</td>
-<td>0.007011</td>
-</tr>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">5853</td>
-<td>Villarreal</td>
-<td>Vallecano</td>
-<td>2</td>
-<td>0</td>
-<td>H</td>
-<td>1.0</td>
-<td>1.4</td>
-<td>3</td>
-<td>3</td>
-<td>0.061313</td>
-<td>0.112777</td>
-<td>0.006915</td>
-</tr>
-<tr class="even">
-<td data-quarto-table-cell-role="th">5857</td>
-<td>Villarreal</td>
-<td>Vallecano</td>
-<td>2</td>
-<td>0</td>
-<td>H</td>
-<td>1.0</td>
-<td>1.4</td>
-<td>4</td>
-<td>1</td>
-<td>0.015328</td>
-<td>0.345236</td>
-<td>0.005292</td>
-</tr>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">20436</td>
-<td>Villarreal</td>
-<td>Vallecano</td>
-<td>0</td>
-<td>1</td>
-<td>A</td>
-<td>1.1</td>
-<td>1.4</td>
-<td>4</td>
-<td>0</td>
-<td>0.020307</td>
-<td>0.246597</td>
-<td>0.005008</td>
-</tr>
-<tr class="even">
-<td data-quarto-table-cell-role="th">20438</td>
-<td>Villarreal</td>
-<td>Vallecano</td>
-<td>0</td>
-<td>1</td>
-<td>A</td>
-<td>1.1</td>
-<td>1.4</td>
-<td>4</td>
-<td>2</td>
-<td>0.020307</td>
-<td>0.241665</td>
-<td>0.004907</td>
-</tr>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">5837</td>
-<td>Villarreal</td>
-<td>Vallecano</td>
-<td>2</td>
-<td>0</td>
-<td>H</td>
-<td>1.0</td>
-<td>1.4</td>
-<td>0</td>
-<td>5</td>
-<td>0.367879</td>
-<td>0.011052</td>
-<td>0.004066</td>
-</tr>
-<tr class="even">
-<td data-quarto-table-cell-role="th">5843</td>
-<td>Villarreal</td>
-<td>Vallecano</td>
-<td>2</td>
-<td>0</td>
-<td>H</td>
-<td>1.0</td>
-<td>1.4</td>
-<td>1</td>
-<td>5</td>
-<td>0.367879</td>
-<td>0.011052</td>
-<td>0.004066</td>
-</tr>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">20423</td>
-<td>Villarreal</td>
-<td>Vallecano</td>
-<td>0</td>
-<td>1</td>
-<td>A</td>
-<td>1.1</td>
-<td>1.4</td>
-<td>1</td>
-<td>5</td>
-<td>0.366158</td>
-<td>0.011052</td>
-<td>0.004047</td>
-</tr>
-<tr class="even">
-<td data-quarto-table-cell-role="th">5856</td>
-<td>Villarreal</td>
-<td>Vallecano</td>
-<td>2</td>
-<td>0</td>
-<td>H</td>
-<td>1.0</td>
-<td>1.4</td>
-<td>4</td>
-<td>0</td>
-<td>0.015328</td>
-<td>0.246597</td>
-<td>0.003780</td>
-</tr>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">5858</td>
-<td>Villarreal</td>
-<td>Vallecano</td>
-<td>2</td>
-<td>0</td>
-<td>H</td>
-<td>1.0</td>
-<td>1.4</td>
-<td>4</td>
-<td>2</td>
-<td>0.015328</td>
-<td>0.241665</td>
-<td>0.003704</td>
-</tr>
-<tr class="even">
-<td data-quarto-table-cell-role="th">20417</td>
-<td>Villarreal</td>
-<td>Vallecano</td>
-<td>0</td>
-<td>1</td>
-<td>A</td>
-<td>1.1</td>
-<td>1.4</td>
-<td>0</td>
-<td>5</td>
-<td>0.332871</td>
-<td>0.011052</td>
-<td>0.003679</td>
-</tr>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">20434</td>
-<td>Villarreal</td>
-<td>Vallecano</td>
-<td>0</td>
-<td>1</td>
-<td>A</td>
-<td>1.1</td>
-<td>1.4</td>
-<td>3</td>
-<td>4</td>
-<td>0.073842</td>
-<td>0.039472</td>
-<td>0.002915</td>
-</tr>
-<tr class="even">
-<td data-quarto-table-cell-role="th">5854</td>
-<td>Villarreal</td>
-<td>Vallecano</td>
-<td>2</td>
-<td>0</td>
-<td>H</td>
-<td>1.0</td>
-<td>1.4</td>
-<td>3</td>
-<td>4</td>
-<td>0.061313</td>
-<td>0.039472</td>
-<td>0.002420</td>
-</tr>
-</tbody>
-</table>
-
+<div id="cell-fig-sample-game-preds" class="cell" data-execution_count="20">
+<div class="cell-output cell-output-display">
+<div id="fig-sample-game-preds" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-sample-game-preds-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="index_files/figure-html/fig-sample-game-preds-output-1.png" class="img-fluid figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-sample-game-preds-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;2: Stemplot of a single game probability
+</figcaption>
+</figure>
 </div>
 </div>
 </div>
-<div id="d7b65a35" class="cell" data-execution_count="23">
+<div id="fb961136" class="cell" data-execution_count="24">
 <div class="cell-output cell-output-stdout">
 <pre><code>The accuracy of the model is 0.3711 and the balanced accuracy is 0.3952</code></pre>
 </div>
 </div>
-</section>
-</section>
-<section id="model-random-forest-of-home-and-away-goal-rates" class="level1">
-<h1>Model: Random forest of home and away goal rates</h1>
+<!--
+TODO:
+# Model: Random forest of home and away goal rates
+-->
 
 
+</section>
 </section>
 
 </main> <!-- /main -->

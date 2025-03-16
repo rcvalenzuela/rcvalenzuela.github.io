@@ -240,7 +240,7 @@ window.Quarto = {
 <section id="introduction" class="level2">
 <h2 class="anchored" data-anchor-id="introduction">Introduction</h2>
 <p>We consider the problem of estimating the effect of variable <span class="math inline">\(X\)</span> on a target variable <span class="math inline">\(Y\)</span> from a sample obtained from an unnknown distribution. For simplicity in our first example both <span class="math inline">\(X\)</span> and <span class="math inline">\(Y\)</span> are binary variables. Also, there is an extra variable <span class="math inline">\(Z\)</span> which is also binary.</p>
-<div id="0d9d568d" class="cell" data-execution_count="3">
+<div id="af4bba98" class="cell" data-execution_count="3">
 <div class="cell-output cell-output-display" data-execution_count="3">
 <div>
 
@@ -259,31 +259,31 @@ window.Quarto = {
 <td data-quarto-table-cell-role="th">0</td>
 <td>1</td>
 <td>1</td>
-<td>0</td>
+<td>1</td>
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">1</td>
-<td>1</td>
+<td>0</td>
 <td>0</td>
 <td>0</td>
 </tr>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">2</td>
-<td>0</td>
-<td>0</td>
+<td>1</td>
+<td>1</td>
 <td>0</td>
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">3</td>
 <td>1</td>
-<td>1</td>
-<td>1</td>
+<td>0</td>
+<td>0</td>
 </tr>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">4</td>
 <td>1</td>
-<td>1</td>
 <td>0</td>
+<td>1</td>
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">5</td>
@@ -293,15 +293,15 @@ window.Quarto = {
 </tr>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">6</td>
-<td>0</td>
+<td>1</td>
 <td>0</td>
 <td>0</td>
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">7</td>
-<td>1</td>
-<td>1</td>
-<td>1</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
 </tr>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">8</td>
@@ -325,7 +325,7 @@ window.Quarto = {
 <p>One possibility to estimate this effect would be <span class="math display">\[
 \hat{e}_{1} = \mathbb{E}\left[Y \mid X = 0\right] - \mathbb{E}\left[Y \mid X = 1\right]
 \]</span></p>
-<div id="bc489a65" class="cell" data-execution_count="4">
+<div id="0d96564d" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>e1 <span class="op">=</span> obs.loc[obs.X <span class="op">==</span> <span class="dv">1</span>, <span class="st">'Y'</span>].mean() <span class="op">-</span> obs.loc[obs.X <span class="op">==</span> <span class="dv">0</span>, <span class="st">'Y'</span>].mean()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p><strong>Correlation does not imply causation</strong> refers to the inability to legitimately deduce a cause-and-effect relationship between two events or variables solely on the basis of an observed association or correlation between them <a href="#wik_corrnotcause">(Correlation does not imply causation)</a>. Although this statement agrees with what our common sense tells us only recently a proper causal inference framework has been developed which allows us to formally specify the difference.</p>
@@ -436,10 +436,10 @@ f_{Y} &amp;: Y = 1_{X + Z + U_{Y} &gt; 2}
 </div>
 <p>We will assume <span class="math inline">\(U_{i}\)</span> are standard normal random variables. Recall that for binary variables probabilities are equal to means and computing conditional probabilities is particularly easy.</p>
 <p>We see that <span class="math inline">\(P\left( Y \mid \text{do}\left(X\right)\right)\)</span> is different from <span class="math inline">\(P\left( Y \mid X = 1\right)\)</span></p>
-<div id="b1f6e5d3" class="cell" data-execution_count="5">
+<div id="93e85d5d" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f'</span><span class="sc">{</span>np<span class="sc">.</span>mean(y)<span class="sc">}</span><span class="ss">, </span><span class="sc">{</span>np<span class="sc">.</span>mean(y_dox)<span class="sc">}</span><span class="ss">, </span><span class="sc">{</span>np<span class="sc">.</span>mean(y[x<span class="op">==</span><span class="dv">1</span>])<span class="sc">}</span><span class="ss">'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>0.2278, 0.3297, 0.39217252396166136</code></pre>
+<pre><code>0.2335, 0.3309, 0.39857510389867407</code></pre>
 </div>
 </div>
 </section>
@@ -469,7 +469,7 @@ str = asp + hd
 </div>
 </div>
 <p>Our goal is to estimate the coefficients from a sample of the data</p>
-<div id="273b3650" class="cell" data-execution_count="6">
+<div id="ab0a6cce" class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Size of sample</span></span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>n_sample <span class="op">=</span> <span class="dv">100</span></span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -478,29 +478,29 @@ str = asp + hd
 <span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>abt[<span class="st">'str'</span>] <span class="op">=</span> abt[<span class="st">'hd'</span>] <span class="op">+</span> abt[<span class="st">'asp'</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>We use a linear regression model to generate the estimation</p>
-<div id="dcb9e10f" class="cell" data-execution_count="7">
+<div id="46aa0122" class="cell" data-execution_count="7">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>reg <span class="op">=</span> LinearRegression().fit(abt[[<span class="st">'asp'</span>]], abt[[<span class="st">'str'</span>]])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>The coefficient of determination is given by 1.0</p>
-<div id="03139461" class="cell" data-execution_count="8">
+<div id="2e4d3511" class="cell" data-execution_count="8">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(reg.coef_, reg.intercept_)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[[1.5]] [-4.4408921e-16]</code></pre>
+<pre><code>[[1.5]] [4.4408921e-16]</code></pre>
 </div>
 </div>
-<div id="a5f7fe77" class="cell" data-execution_count="9">
+<div id="67afd646" class="cell" data-execution_count="9">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>reg_adj <span class="op">=</span> LinearRegression().fit(abt[[<span class="st">'hd'</span>, <span class="st">'asp'</span>]], abt[[<span class="st">'str'</span>]])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div id="f61250d3" class="cell" data-execution_count="10">
+<div id="f614814b" class="cell" data-execution_count="10">
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>reg_adj.score(abt[[<span class="st">'hd'</span>, <span class="st">'asp'</span>]], abt[[<span class="st">'str'</span>]])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="10">
 <pre><code>1.0</code></pre>
 </div>
 </div>
-<div id="16a611ee" class="cell" data-execution_count="11">
+<div id="3345c674" class="cell" data-execution_count="11">
 <div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(reg_adj.coef_, reg_adj.intercept_)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[[0.6 1.2]] [8.8817842e-16]</code></pre>
+<pre><code>[[0.6 1.2]] [-2.22044605e-16]</code></pre>
 </div>
 </div>
 </section>
