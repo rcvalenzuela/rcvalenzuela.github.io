@@ -11,8 +11,7 @@ draft: false
 
 <!--
 TODO:
-- Why are some duplicates in games_to_predict_all_res?
-- Add a scatter plot of hma10 versus ama10 ... label by result
+- Add custom (google) font to plots
 -->
 
 # Introduction
@@ -53,7 +52,7 @@ all_results.head()
 
 where `fthg` stands for full-time home team goals, `ftag` stands for full-time away team goals and `ftr` stands for full-time result which can take values `H` if the game ends in a win for the home team, `A` if the game ends in a win for the away team or `D` if the game ends in a draw.
 
-# Model: Independent Poisson models
+# Model 1: Independent Poisson of number of goals scored by team
 
 ## High level approach
 
@@ -68,7 +67,7 @@ where `fthg` stands for full-time home team goals, `ftag` stands for full-time a
 
 ### Fitting the Poisson model
 
-The probability mass function of a Poisson distributed random variable $X$ is:
+The probability mass function of a [Poisson distributed random variable](https://en.wikipedia.org/wiki/Poisson_distribution) $X$ is:
 $$
 \begin{equation*}
 p_{X}(k) = \mathbb{P}\text{r}\left(X = k\right) = e^{-\lambda}\frac{\lambda^{k}}{k!}
@@ -149,7 +148,7 @@ As a check, we verify the number of games each team has played during the course
  .reset_index())
 ```
 
-Model fitting consists in calculating for each team we the rolling mean over a period of previous 10 games. We have to ensure that the result of the current game is not used rolling mean calculation (if we didn't we would have data leakage). The first estimate for the rolling mean will be for the 11th game. A sample of the model fitting results is shown in @tbl-fit-alaves
+Model fitting consists in calculating for each team the rolling mean over a period of previous 10 games. We have to ensure that the result of the current game is not used rolling mean calculation (if we didn't we would have data leakage). The first estimate for the rolling mean will be for the 11th game. A sample of the model fitting results is shown in @tbl-fit-alaves
 
 ```{python}
 # When calculating the moving average we exclude the last point from the window to avoid leakage
@@ -226,7 +225,7 @@ games_to_predict = (all_results
 ```
 
 ```{python}
-gtp_cols = ['ht', 'at', 'ftr', 'hma10', 'ama10']
+gtp_cols = ['season', 'ht', 'at', 'ftr', 'hma10', 'ama10']
 games_to_predict[gtp_cols].head()
 ```
 
@@ -255,8 +254,45 @@ games_to_predict_all_res['joint_prob'] = games_to_predict_all_res['h_prob'] * ga
 ```
 
 ```{python}
-gtp_all_res_cols = ['ht', 'at', 'fthg', 'ftag', 'ftr', 'hma10', 'ama10', 'pred_hgoals', 'pred_agoals', 'h_prob', 'a_prob', 'joint_prob']
-games_to_predict_all_res[gtp_all_res_cols].dropna().sort_values(['ht', 'at', 'joint_prob'], ascending=False).head(50)
+gtp_all_res_cols = ['season', 'ht', 'at', 'fthg', 'ftag', 'ftr', 'hma10', 'ama10', 'pred_hgoals', 'pred_agoals', 'h_prob', 'a_prob', 'joint_prob']
+
+# Visualization
+df_to_stem = (games_to_predict_all_res[gtp_all_res_cols]
+              .dropna()
+              .sort_values(['season', 'ht', 'at', 'joint_prob'], ascending=False)
+              .head(36)
+              .copy()
+              .reset_index(drop=True))
+
+game_label = f'{df_to_stem.loc[0, 'ht']}({df_to_stem.loc[0, 'fthg']}) - {df_to_stem.loc[0, 'at']}({df_to_stem.loc[0, 'ftag']})'
+
+df_to_stem['results_label'] = df_to_stem['pred_hgoals'].astype(str) + '-' + df_to_stem['pred_agoals'].astype(str)
+```
+
+```{python}
+#| label: fig-sample-game-preds
+#| fig-cap: "Stemplot of a single game probability"
+
+with plt.style.context('seaborn-v0_8-whitegrid'):
+  # Create a figure and an axes object
+  _, ax = plt.subplots(figsize=(12,4))
+
+  # Creating a vertical stem plot
+  ax.stem(df_to_stem['results_label'], df_to_stem['joint_prob'])
+
+  # Adding labels and title
+  ax.set_xlabel('Result')
+  ax.set_ylabel('Joint probability')
+
+  # Show grid
+  ax.grid(True)
+
+plt.xticks(rotation = 15)
+plt.tight_layout()
+
+# Display the plot
+plt.show()
+
 ```
 
 ```{python}
@@ -283,5 +319,9 @@ from sklearn.metrics import accuracy_score, balanced_accuracy_score
 print(f'The accuracy of the model is {accuracy_score(predictions.ftr, predictions.pred_ftr, normalize=True):.4f} and the balanced accuracy is {balanced_accuracy_score(predictions.ftr, predictions.pred_ftr):.4f}')
 ```
 
-# Model: Random forest of home and away goal rates
 
+
+<!--
+TODO:
+# Model: Random forest of home and away goal rates
+-->
