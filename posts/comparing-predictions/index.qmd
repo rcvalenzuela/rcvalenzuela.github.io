@@ -1,0 +1,71 @@
+---
+title: "Comparing the outcomes of two classification models (WIP)"
+author: "René Valenzuela"
+execute:
+  echo: false
+date: "2025-03-21"
+date-modified: last-modified
+categories: [predictive-modeling]
+draft: true
+---
+
+```{python}
+import numpy as np
+from scipy.stats import beta, binom
+```
+
+We consider the following problem: A prediction model partitions a population into: very high (vh), high (h), medium (m) and low (l) risk.The very high group is much smaller than the low risk group (typically 50 times smaller). With the given model some actions are taken on the very high and high groups. The objective of the actions is to lower the risk of those groups.
+
+The metric to be used to measure the performance is the fraction of accurate predictions in the high risk group over the fraction of accurate predictions on the low risk group
+$$
+L = \frac{p_{vh}}{p_{l}}
+$$
+
+We consider our algorithm works if $L$ is large. The minimum requirement is that $L>1$. Our goal is to find sample sizes $n_{1}$ and $n_{2}$ so that we can assert with a large confidence that the minimum requirement is met.
+
+## A method
+
+
+
+```{python}
+x1_sample = binom.rvs(n1, p1, size=100000)
+x2_sample = binom.rvs(n2, p2, size=100000)
+
+stat_sample = (x1_sample/n1) / (x2_sample/n2)
+
+alpha_perc = 100-95
+lower_ci = np.percentile(stat_sample, alpha_perc/2)
+median_ci = np.percentile(stat_sample, 50)
+upper_ci = np.percentile(stat_sample, 100-alpha_perc/2)
+
+print(lower_ci, median_ci, upper_ci)
+```
+
+## Overlap interval confidence method
+
+We will consider two populations one with proportion $p_{1}$ and the other with proportion $p_{2}$.
+We sample $N_{1}$ from the first population and $N_{2}$. We construct confidence intervals for each proportion and then check if the intervals overlap
+
+
+```{python}
+n1 = 150
+p1 = 0.04
+
+n2 = 5000
+p2 = 0.01
+
+alpha = 0.05
+
+# Jeffries interval
+x1 = binom.rvs(n1, p1, 1)
+lcl1 = beta.ppf(alpha/2, x1 + 0.5, n1 - x1 + 0.5)
+ucl1 = beta.ppf(1 - alpha/2, x1 + 0.5, n1 - x1 + 0.5)
+
+
+x2 = binom.rvs(n2, p2, 1)
+lcl2 = beta.ppf(alpha/2, x2 + 0.5, n2 - x2 + 0.5)
+ucl2 = beta.ppf(1 - alpha/2, x2 + 0.5, n2 - x2 + 0.5)
+
+print([lcl1, ucl1], [lcl2, ucl2])
+```
+
