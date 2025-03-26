@@ -132,7 +132,7 @@ window.Quarto = {
   </li>  
   <li class="nav-item">
     <a class="nav-link" href="../../talks.html"> 
-<span class="menu-text">Talks</span></a>
+<span class="menu-text">Slides</span></a>
   </li>  
 </ul>
           </div> <!-- /navcollapse -->
@@ -197,7 +197,7 @@ window.Quarto = {
     <div>
     <div class="quarto-title-meta-heading">Modified</div>
     <div class="quarto-title-meta-contents">
-      <p class="date-modified">March 16, 2025</p>
+      <p class="date-modified">March 26, 2025</p>
     </div>
   </div>
     
@@ -214,7 +214,8 @@ TODO:
 -->
 <section id="introduction" class="level1">
 <h1>Introduction</h1>
-<p>Our goal is to create a model to predict the outcome of La Liga games</p>
+<p>Our goal is to create a model to predict the outcome of La Liga games. The outcome can be one of three possible values: <span class="math inline">\(H\)</span> (home team wins), <span class="math inline">\(A\)</span> (away team wins) and <span class="math inline">\(D\)</span> (draw).</p>
+<p>We will use the <a href="https://scikit-learn.org/stable/modules/model_evaluation.html#balanced-accuracy-score">balanced accuracy score</a> as the metric to rank the different models. Balanced accuracy is the macro average of recall scores per class or equivalently, raw accuracy where each sample is weighted according to the prevalence of its true class. We choose it because it is somewhat robust to class size variations as it avergaes the performance over all classes rather than favoring the larger ones.</p>
 </section>
 <section id="dataset" class="level1">
 <h1>Dataset</h1>
@@ -309,7 +310,14 @@ Table&nbsp;1: Input dataset. Results of the 21-22 La Liga season
 </figure>
 </div>
 </div>
-<p>where <code>fthg</code> stands for full-time home team goals, <code>ftag</code> stands for full-time away team goals and <code>ftr</code> stands for full-time result which can take values <code>H</code> if the game ends in a win for the home team, <code>A</code> if the game ends in a win for the away team or <code>D</code> if the game ends in a draw.</p>
+<p>where <code>fthg</code> stands for full-time home team goals, <code>ftag</code> stands for full-time away team goals and <code>ftr</code> stands for full-time result (outcome of the game).</p>
+<!--
+
+# Model 0: Baseline - Elegir al azar
+
+# Model 1: Ranking and goal-average
+
+-->
 </section>
 <section id="model-1-independent-poisson-of-number-of-goals-scored-by-team" class="level1">
 <h1>Model 1: Independent Poisson of number of goals scored by team</h1>
@@ -700,7 +708,7 @@ Figure&nbsp;1: Heatmap of rate parameter by team and season game
 <section id="generating-predictions" class="level2">
 <h2 class="anchored" data-anchor-id="generating-predictions">Generating predictions</h2>
 <p>To generate predictions we first attach the estimated rate parameters of the home team and of the away team for each game played in the season:</p>
-<div id="484829fb" class="cell" data-execution_count="16">
+<div id="1bc309e7" class="cell" data-execution_count="16">
 <div class="cell-output cell-output-display" data-execution_count="16">
 <div>
 
@@ -769,7 +777,7 @@ Figure&nbsp;1: Heatmap of rate parameter by team and season game
 </div>
 </div>
 </div>
-<p>We then generate (for each game) all possible results starting from 0-0 and up to 5-5, i.e.&nbsp;36 possible scores for each game and assign the corresponding probability using the Poisson mass probability function</p>
+<p>We then generate (for each game) all possible results starting from 0-0 and up to 5-5, i.e.&nbsp;36 possible scores for each game and assign the corresponding probability using the Poisson mass probability function. <a href="#fig-sample-game-preds" class="quarto-xref">Figure&nbsp;2</a> shows a stemplot of the probabilities assigned to each of the 36 scores for one of the games in the league. In this case, since the score with higher probability is <strong>1-1</strong> we would predict the outcome of the game as a draw <strong>D</strong>.</p>
 <div id="cell-fig-sample-game-preds" class="cell" data-execution_count="20">
 <div class="cell-output cell-output-display">
 <div id="fig-sample-game-preds" class="quarto-float quarto-figure quarto-figure-center anchored">
@@ -784,7 +792,7 @@ Figure&nbsp;2: Stemplot of a single game probability
 </div>
 </div>
 </div>
-<div id="fb961136" class="cell" data-execution_count="24">
+<div id="6086d88c" class="cell" data-execution_count="24">
 <div class="cell-output cell-output-stdout">
 <pre><code>The accuracy of the model is 0.3711 and the balanced accuracy is 0.3952</code></pre>
 </div>

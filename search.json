@@ -35,6 +35,34 @@
     "text": "References\n\nSection 1.6 R examples. Causal Data Science with Directed Acyclic graphs. Udemy\nPearl 2016: Causal inference in Statistics. A primer. Judea Pearl, Madelyn Glymour and Nicholas P. Jewell\nCorrelation does not imply causation: Wikipedia article Correlation does not imply causation"
   },
   {
+    "objectID": "about.html",
+    "href": "about.html",
+    "title": "About",
+    "section": "",
+    "text": "About this site"
+  },
+  {
+    "objectID": "talks.html",
+    "href": "talks.html",
+    "title": "Slides",
+    "section": "",
+    "text": "Bootstrapping\n\n\n\n\n\n\n\n\nMar 24, 2025\n\n\nRené Valenzuela\n\n\n1 min\n\n\n\n\n\n\nNo matching items"
+  },
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "Rene Valenzuela",
+    "section": "",
+    "text": "Hi there! I’m René a data scientist with a passion for teaching and exploring new things"
+  },
+  {
+    "objectID": "blog.html",
+    "href": "blog.html",
+    "title": "Understanding Machine Learning",
+    "section": "",
+    "text": "Modeling the outcome of soccer games\n\n\n\n\n\n\n\n\nJul 18, 2023\n\n\nRené Valenzuela\n\n\n13 min\n\n\n\n\n\n\n\n\n\n\n\n\nSimulation of basic causal structures\n\n\n\n\n\n\n\n\nOct 28, 2024\n\n\nRené Valenzuela\n\n\n4 min\n\n\n\n\n\n\n\n\n\n\n\n\nExploratory data analysis. Neighbours graph\n\n\n\n\n\n\n\n\nDec 7, 2023\n\n\nRené Valenzuela\n\n\n9 min\n\n\n\n\n\n\n\n\n\n\n\n\nWhat is … conformal prediction\n\n\n\n\n\n\n\n\nJan 9, 2024\n\n\nRené Valenzuela\n\n\n2 min\n\n\n\n\n\n\nNo matching items"
+  },
+  {
     "objectID": "posts/eda-neighbours-graph/index.html",
     "href": "posts/eda-neighbours-graph/index.html",
     "title": "Exploratory data analysis. Neighbours graph",
@@ -84,39 +112,11 @@
     "text": "Visualization\n\n# Create the graph visualization\nplot_options = {\"node_size\": 10, \"with_labels\": False, \"width\": 0.15}\npos = nx.spring_layout(nbh, iterations=15, seed=1721)\nfig, ax = plt.subplots(figsize=(15, 9))\nax.axis(\"off\")\nnx.draw_networkx(nbh, pos=pos, ax=ax, **plot_options)"
   },
   {
-    "objectID": "talks.html",
-    "href": "talks.html",
-    "title": "Talks",
-    "section": "",
-    "text": "Talks"
-  },
-  {
-    "objectID": "index.html",
-    "href": "index.html",
-    "title": "Rene Valenzuela",
-    "section": "",
-    "text": "Hi there! I’m René a data scientist with a passion for teaching and exploring new things"
-  },
-  {
-    "objectID": "blog.html",
-    "href": "blog.html",
-    "title": "Understanding Machine Learning",
-    "section": "",
-    "text": "Modeling the outcome of soccer games\n\n\n\n\n\n\n\n\nJul 18, 2023\n\n\nRené Valenzuela\n\n\n13 min\n\n\n\n\n\n\n\n\n\n\n\n\nSimulation of basic causal structures\n\n\n\n\n\n\n\n\nOct 28, 2024\n\n\nRené Valenzuela\n\n\n4 min\n\n\n\n\n\n\n\n\n\n\n\n\nExploratory data analysis. Neighbours graph\n\n\n\n\n\n\n\n\nDec 7, 2023\n\n\nRené Valenzuela\n\n\n9 min\n\n\n\n\n\n\n\n\n\n\n\n\nWhat is … conformal prediction\n\n\n\n\n\n\n\n\nJan 9, 2024\n\n\nRené Valenzuela\n\n\n2 min\n\n\n\n\n\n\nNo matching items"
-  },
-  {
-    "objectID": "about.html",
-    "href": "about.html",
-    "title": "About",
-    "section": "",
-    "text": "About this site"
-  },
-  {
     "objectID": "posts/soccer-games-outcomes/index.html",
     "href": "posts/soccer-games-outcomes/index.html",
     "title": "Modeling the outcome of soccer games",
     "section": "",
-    "text": "Our goal is to create a model to predict the outcome of La Liga games"
+    "text": "Our goal is to create a model to predict the outcome of La Liga games. The outcome can be one of three possible values: \\(H\\) (home team wins), \\(A\\) (away team wins) and \\(D\\) (draw).\nWe will use the balanced accuracy score as the metric to rank the different models. Balanced accuracy is the macro average of recall scores per class or equivalently, raw accuracy where each sample is weighted according to the prevalence of its true class. We choose it because it is somewhat robust to class size variations as it avergaes the performance over all classes rather than favoring the larger ones."
   },
   {
     "objectID": "posts/soccer-games-outcomes/index.html#high-level-approach",
@@ -144,7 +144,7 @@
     "href": "posts/soccer-games-outcomes/index.html#generating-predictions",
     "title": "Modeling the outcome of soccer games",
     "section": "Generating predictions",
-    "text": "Generating predictions\nTo generate predictions we first attach the estimated rate parameters of the home team and of the away team for each game played in the season:\n\n\n\n\n\n\n\n\n\nseason\nht\nat\nftr\nhma10\nama10\n\n\n\n\n0\ns_21_22\nValencia\nGetafe\nH\nNaN\nNaN\n\n\n1\ns_21_22\nCadiz\nLevante\nD\nNaN\nNaN\n\n\n2\ns_21_22\nMallorca\nBetis\nD\nNaN\nNaN\n\n\n3\ns_21_22\nAlaves\nReal Madrid\nA\nNaN\nNaN\n\n\n4\ns_21_22\nOsasuna\nEspanol\nD\nNaN\nNaN\n\n\n\n\n\n\n\nWe then generate (for each game) all possible results starting from 0-0 and up to 5-5, i.e. 36 possible scores for each game and assign the corresponding probability using the Poisson mass probability function\n\n\n\n\n\n\n\n\nFigure 2: Stemplot of a single game probability\n\n\n\n\n\n\n\nThe accuracy of the model is 0.3711 and the balanced accuracy is 0.3952"
+    "text": "Generating predictions\nTo generate predictions we first attach the estimated rate parameters of the home team and of the away team for each game played in the season:\n\n\n\n\n\n\n\n\n\nseason\nht\nat\nftr\nhma10\nama10\n\n\n\n\n0\ns_21_22\nValencia\nGetafe\nH\nNaN\nNaN\n\n\n1\ns_21_22\nCadiz\nLevante\nD\nNaN\nNaN\n\n\n2\ns_21_22\nMallorca\nBetis\nD\nNaN\nNaN\n\n\n3\ns_21_22\nAlaves\nReal Madrid\nA\nNaN\nNaN\n\n\n4\ns_21_22\nOsasuna\nEspanol\nD\nNaN\nNaN\n\n\n\n\n\n\n\nWe then generate (for each game) all possible results starting from 0-0 and up to 5-5, i.e. 36 possible scores for each game and assign the corresponding probability using the Poisson mass probability function. Figure 2 shows a stemplot of the probabilities assigned to each of the 36 scores for one of the games in the league. In this case, since the score with higher probability is 1-1 we would predict the outcome of the game as a draw D.\n\n\n\n\n\n\n\n\nFigure 2: Stemplot of a single game probability\n\n\n\n\n\n\n\nThe accuracy of the model is 0.3711 and the balanced accuracy is 0.3952"
   },
   {
     "objectID": "posts/conformal-prediction/index.html",

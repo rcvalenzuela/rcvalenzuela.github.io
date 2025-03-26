@@ -1,5 +1,11 @@
 [
   {
+    "listing": "/talks.html",
+    "items": [
+      "/slides/bootstrapping/index.html"
+    ]
+  },
+  {
     "listing": "/blog.html",
     "items": [
       "/posts/soccer-games-outcomes/index.html",
