@@ -52,6 +52,14 @@ all_results.head()
 
 where `fthg` stands for full-time home team goals, `ftag` stands for full-time away team goals and `ftr` stands for full-time result which can take values `H` if the game ends in a win for the home team, `A` if the game ends in a win for the away team or `D` if the game ends in a draw.
 
+<!--
+
+# Model 0: Baseline - Elegir al azar
+
+# Model 1: Ranking and goal-average
+
+-->
+
 # Model 1: Independent Poisson of number of goals scored by team
 
 ## High level approach
