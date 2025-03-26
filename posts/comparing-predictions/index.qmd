@@ -14,7 +14,7 @@ import numpy as np
 from scipy.stats import beta, binom
 ```
 
-We consider the following problem: A prediction model partitions a population into: very high (vh), high (h), medium (m) and low (l) risk.The very high group is much smaller than the low risk group (typically 50 times smaller). With the given model some actions are taken on the very high and high groups. The objective of the actions is to lower the risk of those groups.
+We consider the following problem: A prediction model run on a monthly basis partitions a population into: very high (vh), high (h), medium (m) and low (l) risk. The very high group is much smaller than the low risk group (typically 50 times smaller). With the given model some actions are taken on the very high and high groups. The objective of the actions is to lower the risk of those groups.
 
 The metric to be used to measure the performance is the fraction of accurate predictions in the high risk group over the fraction of accurate predictions on the low risk group
 $$
@@ -23,8 +23,21 @@ $$
 
 We consider our algorithm works if $L$ is large. The minimum requirement is that $L>1$. Our goal is to find sample sizes $n_{1}$ and $n_{2}$ so that we can assert with a large confidence that the minimum requirement is met.
 
-## A method
+To measure the performance we set aside a fraction of the members of the very high and low risk groups. In this setting the very high risk group is small and also the most important one because it is the one where presumably we can have a higher impact with our actions. Hence we would like for the sample this group to be as small as possible.
 
+## Bootstrap confidence interval method
+
+We assume a bootstrap confidence interval will be built from the sample. We wish to estimate the probability that the lower bound of this confidence interval is below 1.
+
+```{python}
+n1 = 150
+p1 = 0.04
+
+n2 = 5000
+p2 = 0.01
+
+alpha = 0.05
+```
 
 
 ```{python}
@@ -48,14 +61,6 @@ We sample $N_{1}$ from the first population and $N_{2}$. We construct confidence
 
 
 ```{python}
-n1 = 150
-p1 = 0.04
-
-n2 = 5000
-p2 = 0.01
-
-alpha = 0.05
-
 # Jeffries interval
 x1 = binom.rvs(n1, p1, 1)
 lcl1 = beta.ppf(alpha/2, x1 + 0.5, n1 - x1 + 0.5)

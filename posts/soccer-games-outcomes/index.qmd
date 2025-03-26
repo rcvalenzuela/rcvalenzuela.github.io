@@ -16,7 +16,9 @@ TODO:
 
 # Introduction
 
-Our goal is to create a model to predict the outcome of La Liga games
+Our goal is to create a model to predict the outcome of La Liga games. The outcome can be one of three possible values: $H$ (home team wins), $A$ (away team wins) and $D$ (draw).
+
+We will use the [balanced accuracy score](https://scikit-learn.org/stable/modules/model_evaluation.html#balanced-accuracy-score) as the metric to rank the different models. Balanced accuracy is the macro average of recall scores per class or equivalently, raw accuracy where each sample is weighted according to the prevalence of its true class. We choose it because it is somewhat robust to class size variations as it avergaes the performance over all classes rather than favoring the larger ones.
 
 # Dataset
 
@@ -25,6 +27,7 @@ The original dataset consists of the results of each of the games played during 
 ```{python}
 import numpy as np
 from scipy.stats import poisson
+from sklearn.metrics import accuracy_score, balanced_accuracy_score
 
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -50,7 +53,15 @@ all_results = all_results.rename(columns={'hometeam':'ht', 'awayteam':'at'})
 all_results.head()
 ```
 
-where `fthg` stands for full-time home team goals, `ftag` stands for full-time away team goals and `ftr` stands for full-time result which can take values `H` if the game ends in a win for the home team, `A` if the game ends in a win for the away team or `D` if the game ends in a draw.
+where `fthg` stands for full-time home team goals, `ftag` stands for full-time away team goals and `ftr` stands for full-time result (outcome of the game).
+
+<!--
+
+# Model 0: Baseline - Elegir al azar
+
+# Model 1: Ranking and goal-average
+
+-->
 
 # Model 1: Independent Poisson of number of goals scored by team
 
@@ -229,8 +240,7 @@ gtp_cols = ['season', 'ht', 'at', 'ftr', 'hma10', 'ama10']
 games_to_predict[gtp_cols].head()
 ```
 
-
-We then generate (for each game) all possible results starting from 0-0 and up to 5-5, i.e. 36 possible scores for each game and assign the corresponding probability using the Poisson mass probability function
+We then generate (for each game) all possible results starting from 0-0 and up to 5-5, i.e. 36 possible scores for each game and assign the corresponding probability using the Poisson mass probability function. @fig-sample-game-preds shows a stemplot of the probabilities assigned to each of the 36 scores for one of the games in the league. In this case, since the score with higher probability is **1-1** we would predict the outcome of the game as a draw **D**.
 
 ```{python}
 # Create grid of results to evaluate
@@ -292,8 +302,9 @@ plt.tight_layout()
 
 # Display the plot
 plt.show()
-
 ```
+
+
 
 ```{python}
 pred_cols = all_results.columns.to_list() + ['pred_hgoals', 'pred_agoals', 'joint_prob']
@@ -314,8 +325,6 @@ df2 = pd.crosstab(predictions.ftr, predictions.pred_ftr)
 ```
 
 ```{python}
-from sklearn.metrics import accuracy_score, balanced_accuracy_score
-
 print(f'The accuracy of the model is {accuracy_score(predictions.ftr, predictions.pred_ftr, normalize=True):.4f} and the balanced accuracy is {balanced_accuracy_score(predictions.ftr, predictions.pred_ftr):.4f}')
 ```
 
