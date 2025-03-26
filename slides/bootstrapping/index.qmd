@@ -1,0 +1,11 @@
+---
+title: "Bootstrapping"
+author: "René Valenzuela"
+execute:
+  echo: false
+date: "2025-03-24"
+date-modified: last-modified
+format: revealjs
+draft: false
+---
+
