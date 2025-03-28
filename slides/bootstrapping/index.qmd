@@ -9,3 +9,6 @@ format: revealjs
 draft: false
 ---
 
+## Introduction
+
+The bootstrap is a data based simulation method for statistical inference
