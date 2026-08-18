@@ -1,0 +1,270 @@
+---
+title: "Cleaning the World Cup Matches dataset"
+author: "Rene Valenzuela"
+date: "2026-08-14"
+date-modified: "2026-08-17"
+categories: [data-cleaning]
+execute:
+  freeze: false
+---
+
+# Introduction
+
+This post documents, end to end, how the raw World Cup Matches dataset is cleaned before it's used in the [World Cup hosting premium analysis](../world-cup-hosting-premium/index.qmd). Keeping the cleaning steps in their own post makes them traceable and reproducible independent of any downstream analysis, and the resulting cleaned dataset is what gets published to Kaggle.
+
+```{python}
+import pandas as pd
+from great_tables import GT, md, html
+```
+
+# Data sources
+
+## World cup hosts
+
+The host nations for each of the World cups is extracted from [Wikipedia](https://en.wikipedia.org/wiki/List_of_FIFA_World_Cup_hosts)
+
+```{python}
+wc_hosts = pd.read_csv('./data/world_cup_hosts.csv')
+```
+
+```{python}
+# Create a display table showing ten of the world's largest islands
+gt_tbl = GT(wc_hosts)
+
+# Show the output table
+gt_tbl
+```
+
+## World cup games
+
+The raw data comes from the [FIFA World Cup dataset](https://www.kaggle.com/datasets/abecklas/fifa-world-cup) on Kaggle. Specifically the `WorldCupMatches.csv` dataset.
+
+```{python}
+# Read data
+wc_games = pd.read_csv('./data/WorldCupMatches.csv')
+```
+
+### Cleaning steps
+
+#### Manual edits
+
+- Some records had the dates recorded as June/July instead of Jun/Jul. These records were manually modified in the `.csv` file to ease further processing.
+- In the 1982 World Cup the second group stage games were manually changed from `1` ... `4` to `A` ... `D`, so the `stage` labels are consistent across tournament years and need to be normalized before they can be used.
+
+#### Deduplication
+
+```{python}
+# Drop extra rows where everything was null
+wc_games = wc_games.dropna(how='all')
+
+# Drop duplictaed rows
+wc_games = wc_games.drop_duplicates()
+```
+
+#### Column names normalization
+
+The raw column names are verbose and inconsistently cased, so they're mapped to short, `snake_case` names:
+
+| Original name         | Normalized name  |
+| ---------------------- | ---------------- |
+| Year                    | year              |
+| Datetime                | match_start       |
+| Stage                   | stage             |
+| Stadium                 | venue             |
+| City                    | city              |
+| Home Team Name          | home_team         |
+| Away Team Name          | away_team         |
+| Home Team Goals         | home_ft_goals     |
+| Away Team Goals         | away_ft_goals     |
+| Win conditions          | resolution_type   |
+| Attendance              | attendance        |
+| Half-time Home Goals    | home_ht_goals     |
+| Half-time Away Goals    | away_ht_goals     |
+| Referee                 | referee           |
+| Assistant 1             | assistant_1       |
+| Assistant 2             | assistant_2       |
+| RoundID                 | round_id          |
+| MatchID                 | match_id          |
+| Home Team Initials      | home_initials     |
+| Away Team Initials      | away_initials     |
+
+```{python}
+# Normalize column names
+col_names_map = {'Year':'year',
+             'Datetime':'match_start',
+             'Stage':'stage',
+             'Stadium':'venue',
+             'City':'city',
+             'Home Team Name':'home_team',
+             'Away Team Name':'away_team',
+             'Home Team Goals': 'home_ft_goals',
+             'Away Team Goals': 'away_ft_goals',
+             'Win conditions':'resolution_type',
+             'Attendance':'attendance',
+             'Half-time Home Goals':'home_ht_goals',
+             'Half-time Away Goals':'away_ht_goals',
+             'Referee':'referee',
+             'Assistant 1':'assistant_1',
+             'Assistant 2':'assistant_2',
+             'RoundID':'round_id',
+             'MatchID':'match_id',
+             'Home Team Initials':'home_initials',
+             'Away Team Initials':'away_initials'
+             }
+wc_games = wc_games.rename(columns=col_names_map)
+```
+
+#### Type normalization
+
+##### Integers
+
+```{python}
+# Normalize int columns
+# Set year as int
+int_cols = ['year', 'home_ft_goals', 'away_ft_goals', 'attendance', 'home_ht_goals', 'away_ht_goals']
+wc_games[int_cols] = wc_games[int_cols].astype('Int64')
+```
+
+##### Datetime
+
+```{python}
+# Normalize match_start
+wc_games['match_start'] = wc_games['match_start'].str.strip()
+
+# Set match_start to datetime
+wc_games['parsed'] = pd.to_datetime(wc_games['match_start'], format='%d %b %Y - %H:%M', errors='coerce')
+
+wc_games = wc_games.drop(columns='match_start').rename(columns={'parsed': 'match_start'})
+```
+
+##### Categorical
+
+###### Stage
+
+```{python}
+
+def normalize_group_stage(row):
+
+    # Normalize stage column
+    stage_map_pre_1982 = {'Group 1':'Group stage',
+                          'Group 2':'Group stage',
+                          'Group 3':'Group stage',
+                          'Group 4':'Group stage',
+                          'Group A':'Second group stage',
+                          'Group B':'Second group stage',
+                          'Group 6':'Final round',
+                          'Preliminary round':'Round of 16',
+                          'First round':'Round of 16',
+                          'Quarter-finals':'Quarter-finals',
+                          'Semi-finals':'Semi-finals',
+                          'Match for third place':'Third-place play-off',
+                          'Final':'Final'}
+
+    stage_map_1982 = {'Group 1':'Group stage',
+                      'Group 2':'Group stage',
+                      'Group 3':'Group stage',
+                      'Group 4':'Group stage',
+                      'Group 5':'Group stage',
+                      'Group 6':'Group stage',
+                      'Group A':'Second group stage',
+                      'Group B':'Second group stage',
+                      'Group C':'Second group stage',
+                      'Group D':'Second group stage',
+                      'Quarter-finals':'Quarter-finals',
+                      'Semi-finals':'Semi-finals',
+                      'Match for third place':'Third-place play-off',
+                      'Final':'Final'}
+
+    stage_map_1986_after = {'Group A':'Group stage',
+                            'Group B':'Group stage',
+                            'Group C':'Group stage',
+                            'Group D':'Group stage',
+                            'Group E':'Group stage',
+                            'Group F':'Group stage',
+                            'Group G':'Group stage',
+                            'Group H':'Group stage',
+                            'Round of 16':'Round of 16',
+                            'Quarter-finals':'Quarter-finals',
+                            'Semi-finals':'Semi-finals',
+                            'Match for third place':'Third-place play-off',
+                            'Third place':'Third-place play-off',
+                            'Play-off for third place':'Third-place play-off',
+                            'Final':'Final'}
+
+
+
+
+    year = row['year']
+    stage = row['stage']
+
+    if year < 1982:
+        mapping = stage_map_pre_1982
+    elif year == 1982:
+        mapping = stage_map_1982
+    elif year >= 1986:
+        mapping = stage_map_1986_after
+
+    else:
+        mapping = {}  # already normalized
+
+    return mapping.get(stage, stage)  # fallback: leave unchanged
+
+# Apply normalization of stages
+wc_games['stage'] = wc_games.apply(normalize_group_stage, axis=1)
+wc_games['stage'] = wc_games['stage'].astype("category")
+
+```
+
+###### Resolution type
+
+```{python}
+
+# Ended in regular time
+mask = wc_games['resolution_type'] == ' '
+wc_games.loc[mask, 'resolution_type'] = 'Regular time'
+
+# Ended in extra time
+mask = wc_games['resolution_type'].str.contains('extra time')
+wc_games.loc[mask, 'resolution_type'] = 'Extra time'
+
+# Ended in penalties
+mask = wc_games['resolution_type'].str.contains('penalties')
+wc_games.loc[mask, 'resolution_type'] = 'PK shootout'
+
+# Ended in golden goal
+mask = wc_games['resolution_type'].str.contains('Golden Goal')
+wc_games.loc[mask, 'resolution_type'] = 'Golden goal'
+```
+
+
+# Team-level (long) dataset
+
+For the hosting-premium analysis, each match needs to become two team-level observations rather than one row with a home and away side. `wc_games` is reshaped into `wc_games_long`, with one row per team per match (`match_id`, `year`, `team`, `goals_for`, `goals_against`), home row first:
+
+```{python}
+wc_games_reset = wc_games.reset_index(drop=True)
+
+home = wc_games_reset[['match_id', 'year', 'home_team', 'home_ft_goals', 'away_ft_goals']].rename(
+    columns={'home_team': 'team', 'home_ft_goals': 'goals_for', 'away_ft_goals': 'goals_against'}
+)
+away = wc_games_reset[['match_id', 'year', 'away_team', 'away_ft_goals', 'home_ft_goals']].rename(
+    columns={'away_team': 'team', 'away_ft_goals': 'goals_for', 'home_ft_goals': 'goals_against'}
+)
+home['_match_order'] = away['_match_order'] = wc_games_reset.index
+
+# Stable sort on the original match order keeps each match's home row before its away row
+wc_games_long = (
+    pd.concat([home, away], ignore_index=True)
+    .sort_values('_match_order', kind='stable')
+    .drop(columns='_match_order')
+    .reset_index(drop=True)
+)
+```
+
+# Output
+
+The cleaned dataset is written out for downstream use (and eventual publication to Kaggle):
+
+```{python}
+wc_games.to_parquet('./data/WorldCupMatches.parquet')
+```
