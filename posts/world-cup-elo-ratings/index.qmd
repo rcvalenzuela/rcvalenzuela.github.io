@@ -1,0 +1,129 @@
+---
+title: "Sourcing pre-tournament Elo ratings"
+author: "Rene Valenzuela"
+date: "2026-08-17"
+date-modified: "2026-08-17"
+categories: [data-cleaning]
+execute:
+  freeze: true
+---
+
+# Introduction
+
+The [World Cup hosting premium analysis](../world-cup-hosting-premium/index.qmd) controls for each team's strength going into a tournament via `pre_elo_rating`. That covariate isn't part of the Kaggle matches dataset, so it's sourced separately here, in its own post, for the same reason the match-cleaning steps live in their own post: it keeps the scrape traceable and reproducible independent of any downstream analysis.
+
+::: {.callout-note}
+## Data attribution
+All Elo ratings on this page are sourced from [**eloratings.net**](https://eloratings.net), the World Football Elo Ratings project. All credit for the underlying rating methodology and data collection belongs to that site — this post only documents how the publicly served data is downloaded and reshaped for analysis here.
+:::
+
+# Data source
+
+[eloratings.net](https://eloratings.net) publishes a "starting" Elo snapshot for every year, e.g. [https://eloratings.net/2026_start](https://eloratings.net/2026_start). The page itself renders client-side (a JS grid) and has no public API, but the grid is populated from two plain TSV files that can be read directly:
+
+- `https://eloratings.net/{year}_start.tsv` — one row per team, ranked by rating, with 31 tab-separated columns: rank-change arrow, rank, team code, rating, highest/average/lowest rank and rating, rank/rating changes over the trailing 3 months, 6 months, 1, 2, 5, and 10 years, total matches played (home/away/neutral), wins/losses/draws, and goals for/against.
+- `https://eloratings.net/en.teams.tsv` — maps each 2-letter team code to its full country name.
+
+```{python}
+from pathlib import Path
+
+import pandas as pd
+```
+
+```{python}
+_HEADERS = {"User-Agent": "Mozilla/5.0"}
+_BASE_URL = "https://eloratings.net"
+
+_RATINGS_COLUMNS = [
+    "rank_chg", "rank", "team_code", "rating",
+    "rank_max", "rating_max", "rank_avg", "rating_avg", "rank_min", "rating_min",
+    "rank_3m_change", "rating_3m_change",
+    "rank_6m_change", "rating_6m_change",
+    "rank_1y_change", "rating_1y_change",
+    "rank_2y_change", "rating_2y_change",
+    "rank_5y_change", "rating_5y_change",
+    "rank_10y_change", "rating_10y_change",
+    "matches_total", "matches_home", "matches_away", "matches_neutral",
+    "wins", "losses", "draws", "goals_for", "goals_against",
+]
+
+def get_starting_elo_ratings(year: int) -> pd.DataFrame:
+    """Download each country's starting Elo rating (and full rating history) for a given World Cup year."""
+    ratings = pd.read_csv(
+        f"{_BASE_URL}/{year}_start.tsv",
+        sep="\t", header=None,
+        names=_RATINGS_COLUMNS,
+        keep_default_na=False,
+        storage_options=_HEADERS,
+    )
+    teams = pd.read_csv(
+        f"{_BASE_URL}/en.teams.tsv",
+        sep="\t", header=None, usecols=[0, 1],
+        names=["team_code", "country"],
+        keep_default_na=False,
+        storage_options=_HEADERS,
+    )
+    ratings = ratings.merge(teams, on="team_code", how="left")
+    ratings["year"] = year
+    other_columns = [c for c in _RATINGS_COLUMNS if c not in ("team_code", "rating")]
+    return ratings[["year", "country", "team_code", "rating", *other_columns]]
+```
+
+# Building the panel
+
+Starting Elo ratings are pulled for every calendar year from 1930 through 2026 — not just World Cup years — and stacked into a single panel, so downstream posts can look up any team's rating in any year without re-scraping. Years already present in the output file from a previous run are skipped, so re-running this post only hits eloratings.net for new years.
+
+```{python}
+_DATA_PATH = Path('./data/elo_ratings.parquet')
+years = range(1930, 2027)
+
+if _DATA_PATH.exists():
+    cached_ratings = pd.read_parquet(_DATA_PATH)
+    cached_years = set(cached_ratings['year'])
+else:
+    cached_ratings = pd.DataFrame()
+    cached_years = set()
+
+missing_years = [year for year in years if year not in cached_years]
+
+if missing_years:
+    new_ratings = pd.concat(
+        [get_starting_elo_ratings(year) for year in missing_years],
+        ignore_index=True,
+    )
+    elo_ratings = pd.concat([cached_ratings, new_ratings], ignore_index=True)
+else:
+    elo_ratings = cached_ratings
+```
+
+# Output
+
+The combined panel — sourced from [eloratings.net](https://eloratings.net) — is written out for downstream use by the data-cleaning and hosting-premium posts:
+
+```{python}
+elo_ratings.to_parquet(_DATA_PATH)
+```
+
+# Visual check
+
+As a sanity check that the scrape actually worked, here's Elo rating over time for two teams read straight back from the parquet file:
+
+```{python}
+import matplotlib.pyplot as plt
+
+saved_ratings = pd.read_parquet(_DATA_PATH)
+
+fig, ax = plt.subplots(figsize=(8, 4.5))
+
+for team, color in [("Argentina", "#2a78d6"), ("France", "#eb6834")]:
+    team_ratings = saved_ratings[saved_ratings["country"] == team].sort_values("year")
+    ax.plot(team_ratings["year"], team_ratings["rating"], label=team, color=color, linewidth=2)
+
+ax.set_xlabel("Year")
+ax.set_ylabel("Starting Elo rating")
+ax.set_title("Starting Elo rating by year")
+ax.legend(frameon=False)
+ax.spines[["top", "right"]].set_visible(False)
+
+fig.tight_layout()
+```
