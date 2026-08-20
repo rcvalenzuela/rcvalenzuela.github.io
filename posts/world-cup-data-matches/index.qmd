@@ -2,7 +2,7 @@
 title: "Cleaning the World Cup Matches dataset"
 author: "Rene Valenzuela"
 date: "2026-08-14"
-date-modified: "2026-08-17"
+date-modified: "2026-08-19"
 categories: [data-cleaning]
 execute:
   freeze: false
@@ -23,6 +23,7 @@ from great_tables import GT, md, html
 
 The host nations for each of the World cups is extracted from [Wikipedia](https://en.wikipedia.org/wiki/List_of_FIFA_World_Cup_hosts)
 
+
 ```{python}
 wc_hosts = pd.read_csv('./data/world_cup_hosts.csv')
 ```
@@ -41,7 +42,7 @@ The raw data comes from the [FIFA World Cup dataset](https://www.kaggle.com/data
 
 ```{python}
 # Read data
-wc_games = pd.read_csv('./data/WorldCupMatches.csv')
+wc_games = pd.read_csv('./data/WorldCupMatches.csv', encoding='utf-8-sig')
 ```
 
 ### Cleaning steps
@@ -50,6 +51,7 @@ wc_games = pd.read_csv('./data/WorldCupMatches.csv')
 
 - Some records had the dates recorded as June/July instead of Jun/Jul. These records were manually modified in the `.csv` file to ease further processing.
 - In the 1982 World Cup the second group stage games were manually changed from `1` ... `4` to `A` ... `D`, so the `stage` labels are consistent across tournament years and need to be normalized before they can be used.
+- Manuall deleted extra string in 3 countries Bosnia and Herzegovina
 
 #### Deduplication
 
@@ -236,29 +238,15 @@ mask = wc_games['resolution_type'].str.contains('Golden Goal')
 wc_games.loc[mask, 'resolution_type'] = 'Golden goal'
 ```
 
-
-# Team-level (long) dataset
-
-For the hosting-premium analysis, each match needs to become two team-level observations rather than one row with a home and away side. `wc_games` is reshaped into `wc_games_long`, with one row per team per match (`match_id`, `year`, `team`, `goals_for`, `goals_against`), home row first:
+###### Home team and Away team
 
 ```{python}
-wc_games_reset = wc_games.reset_index(drop=True)
-
-home = wc_games_reset[['match_id', 'year', 'home_team', 'home_ft_goals', 'away_ft_goals']].rename(
-    columns={'home_team': 'team', 'home_ft_goals': 'goals_for', 'away_ft_goals': 'goals_against'}
-)
-away = wc_games_reset[['match_id', 'year', 'away_team', 'away_ft_goals', 'home_ft_goals']].rename(
-    columns={'away_team': 'team', 'away_ft_goals': 'goals_for', 'home_ft_goals': 'goals_against'}
-)
-home['_match_order'] = away['_match_order'] = wc_games_reset.index
-
-# Stable sort on the original match order keeps each match's home row before its away row
-wc_games_long = (
-    pd.concat([home, away], ignore_index=True)
-    .sort_values('_match_order', kind='stable')
-    .drop(columns='_match_order')
-    .reset_index(drop=True)
-)
+normalized_countries = {'USA':'United States of America', 
+                        'Korea Republic':'Republic of Korea',
+                        'Korea DPR':"Democratic People's Republic of Korea",
+                        'German DR': 'Germany DR',
+                        'Iran':'IR Iran'}
+wc_games[['home_team', 'away_team']] = wc_games[['home_team', 'away_team']].replace(normalized_countries)
 ```
 
 # Output
@@ -266,5 +254,5 @@ wc_games_long = (
 The cleaned dataset is written out for downstream use (and eventual publication to Kaggle):
 
 ```{python}
-wc_games.to_parquet('./data/WorldCupMatches.parquet')
+wc_games.to_parquet('./data/world_cup_matches.parquet')
 ```
