@@ -2,9 +2,11 @@
 title: "Does hosting the World cup boost performance?"
 author: "Rene Valenzuela"
 date: "2026-08-12"
-date-modified: "2026-08-16"
+date-modified: "2026-08-20"
 categories: [difference-in-differences]
 image: "world_cup_trophy.jpg"
+execute:
+  freeze: false
 ---
 
 # Introduction
@@ -19,13 +21,28 @@ Simply comparing host teams to non-host teams, or comparing a host team's perfor
 
 Following the [PICO framework](https://en.wikipedia.org/wiki/PICO_process) we identify:
 
-- **Population**: Every tema that has participated in a World cup
+- **Population**: Every team that has participated in a World cup
 - **Intervention**: Selecting one of the teams as hosts of the world cup in year $T$.
 - **Control group**: Similar elite/mid-tier nations that qualified for year T but did not host.
-- **Outcome**: We choose first *Average goal-difference over the tournament* as the outcome variable
+- **Outcome**: We choose first *Average goal-difference over the tournament* as the outcome variable, i.e.,
+$$
+\text{avg\_goal\_diff} = \frac{\text{goals\_for} - \text{goals\_against}}{\text{n\_games}}
+$$
 
+We fit the classical TWFE model by estimating the following equation via Ordinary Least Squares (OLS):
+$$
+Y_{it} = \beta_{0} + \beta_{1} \text{is\_host}_{it} + \beta_{2}\text{pre\_elo\_rating} + \gamma_{i} + \delta_{t} + \epsilon_{it}
+$$
+
+- **Entity fixed effects ($\gamma_i$)**: Implemented via `team_id`. This absorbs all time-invariant, team-specific unobservables — historical football culture, baseline national infrastructure, long-term geographic advantages, and the like.
+- **Time fixed effects ($\delta_t$)**: Implemented via `year`. This absorbs team-invariant, time-specific shocks such as changes in global tournament rules, ball design, tactical trends of a given era, or macro weather conditions.
+- **The key estimator ($\beta_1$)**: `is_host` is the treatment indicator. Because unit and time effects are partialled out, $\beta_1$ estimates the effect of hosting on goal differential per game, comparing a team to its own non-hosting baseline while controlling for tournament-wide trends and time-varying strength (`pre_elo_rating`).
+
+Pre-tournament Elo rating is a good control precisely because it's measured before the tournament, avoiding bad-control / mediator problems, where a covariate is itself affected by the treatment. Make sure `pre_elo_rating` is captured before any home-field advantage or hosting assignment could influence it.
 
 # Methodology
+
+# Dataset
 
 Difference-in-differences (DiD) measures the effect of a treatment by comparing the change over time in a treatment group against the change over time in a control group.
 
@@ -37,50 +54,210 @@ Difference-in-differences (DiD) measures the effect of a treatment by comparing 
 | is_host            | Binary       | (0/1)1 if hosting that tournament, 0 otherwise | Treatment (D)            |
 | pre_elo_rating      | Numeric      | FIFA ranking (or Elo rating) 6 months prior    | Pre-treatment Covariate  |
 
-The raw dataset is cleaned in a separate [data-cleaning post](../world-cup-data-cleaning/index.qmd), which documents every transformation — column renaming, deduplication, dtype coercion, and stage-label normalization across World Cup rule changes — and produces the cleaned CSV used below.
+The raw dataset is cleaned in separates data-cleaning posts for the [matches](../world-cup-data-matches/index.qmd) and for the [ELO ratings](../world-cup-data-matches/index.qmd), which documents every transformation — column renaming, deduplication, dtype coercion, and stage-label normalization across World Cup rule changes — and produces the cleaned datasets used below.
 
 ```{python}
 import pandas as pd
 ```
 
+## Team-level (long) dataset
+
+For the hosting-premium analysis, each match needs to become two team-level observations rather than one row with a home and away side. `wc_games` is reshaped into `wc_games_long`, with one row per team per match (`match_id`, `year`, `team`, `goals_for`, `goals_against`), home row first:
+
 ```{python}
 # Read cleaned data (produced by the data-cleaning post)
-wc_games = pd.read_parquet('../world-cup-data-cleaning/data/WorldCupMatches.parquet')
+wc_games = pd.read_parquet('../world-cup-data-matches/data/world_cup_matches.parquet')
 ```
 
 
 
-The code fits the classical TWFE model by estimating the following equation via Ordinary Least Squares (OLS):
-$$
-Y_{it} = \beta_{0} + \beta_{1} \text{is\_host}_{it} + \beta_{2}\text{pre\_elo\_rating} + \gamma_{i} + \delta_{t} + \epsilon_{it}
-$$
+```{python}
+wc_games_reset = wc_games.reset_index(drop=True)
 
-- **Entity fixed effects ($\gamma_i$)**: Implemented via `C(team_id)`, which creates a binary indicator (dummy) variable for every unique team, minus one baseline. This absorbs all time-invariant, team-specific unobservables — historical football culture, baseline national infrastructure, long-term geographic advantages, and the like.
-- **Time fixed effects ($\delta_t$)**: Implemented via `C(year)`, which creates a dummy variable for every tournament year, minus one baseline. This absorbs team-invariant, time-specific shocks such as changes in global tournament rules, ball design, tactical trends of a given era, or macro weather conditions.
-- **The key estimator ($\beta_1$)**: `is_host` is the treatment indicator. Because unit and time effects are partialled out, $\beta_1$ estimates the effect of hosting on goal differential per game, comparing a team to its own non-hosting baseline while controlling for tournament-wide trends and time-varying strength (`pre_elo_rating`).
+home = wc_games_reset[['match_id', 'year', 'home_team', 'home_ft_goals', 'away_ft_goals']].rename(
+    columns={'home_team': 'team_id', 'home_ft_goals': 'goals_for', 'away_ft_goals': 'goals_against'}
+)
+away = wc_games_reset[['match_id', 'year', 'away_team', 'away_ft_goals', 'home_ft_goals']].rename(
+    columns={'away_team': 'team_id', 'away_ft_goals': 'goals_for', 'home_ft_goals': 'goals_against'}
+)
+home['_match_order'] = away['_match_order'] = wc_games_reset.index
 
-Using `C(team_id)` forces statsmodels to explicitly construct a matrix column for every nation in the dataset — the Least Squares Dummy Variable (LSDV) approach.
+# Stable sort on the original match order keeps each match's home row before its away row
+wc_games_long = (
+    pd.concat([home, away], ignore_index=True)
+    .sort_values('_match_order', kind='stable')
+    .drop(columns='_match_order')
+    .reset_index(drop=True)
+)
+```
 
-As the number of teams grows, inverting the $(X^T X)$ matrix becomes slow, memory-heavy, and clutters the summary table with hundreds of unwanted coefficient rows.
+```{python}
+abt = wc_games_long.groupby(['year', 'team_id']).agg(
+    goals_for=('goals_for', 'sum'),
+    goals_against=('goals_against', 'sum'),
+    n_games=('goals_for', 'size')  # or any column, size counts rows in group
+    ).reset_index()
+abt['avg_goal_diff'] = (abt['goals_for'] - abt['goals_against']) / abt['n_games']
+abt = abt[['year', 'team_id', 'avg_goal_diff']]
+```
 
-A better approach is to use linearmodels, which de-means and absorbs fixed effects without ever constructing dummy variables, or PyFixest.
+```{python}
+# Load the hosts
+wc_hosts = pd.read_csv('../world-cup-data-matches/data/world_cup_hosts.csv')
+wc_hosts['is_host'] = 1
+wc_hosts = wc_hosts.rename(columns={'host_nation':'team_id'})
+```
 
-```python
+```{python}
+# Merge with the ABT
+abt = abt.merge(wc_hosts[['year', 'team_id', 'is_host']],
+                how='left',
+                on = ['year', 'team_id'])
+abt['is_host'] = abt['is_host'].fillna(0)
+```
+
+```{python}
+# Load the ELO ratings
+country_elo_ratings = pd.read_parquet('../world-cup-data-elo-ratings/data/elo_ratings.parquet')
+country_elo_ratings = country_elo_ratings.rename(columns={'country':'team_id', 'rating':'pre_elo_rating'})
+```
+
+```{python}
+abt = abt.merge(country_elo_ratings[['year', 'team_id', 'pre_elo_rating']],
+                how='left',
+                on=['year', 'team_id'])
+```
+
+
+# Fitting the model
+
+One possibility in fitting the model was using [statsmodels](https://www.statsmodels.org/stable/user-guide.html) and `C(team_id)`. However, this forces to explicitly construct a matrix column for every nation in the dataset — the Least Squares Dummy Variable (LSDV) approach. As the number of teams grows, inverting the $(X^T X)$ matrix becomes slow, memory-heavy, and clutters the summary table with hundreds of unwanted coefficient rows.
+
+We choose instead an alternative approach where we use [linearmodels](https://bashtage.github.io/linearmodels/panel/panel/linearmodels.panel.model.PanelOLS.html#linearmodels.panel.model.PanelOLS), which de-means and absorbs fixed effects without ever constructing dummy variables.
+
+```{python}
 from linearmodels.panel import PanelOLS
 
 # Set multi-index for Entity and Time
-df_panel = df.set_index(['team_id', 'year'])
+df_panel = abt.set_index(['team_id', 'year'])
 
 # Fit TWFE model directly
 mod = PanelOLS.from_formula(
-    'goal_diff_per_game ~ is_host + pre_elo_rating + EntityEffects + TimeEffects',
+    'avg_goal_diff ~ is_host + pre_elo_rating + EntityEffects + TimeEffects',
     data=df_panel
 )
 
 # Fit with clustered standard errors
 results = mod.fit(cov_type='clustered', cluster_entity=True)
-print(results)
 
 ```
 
-Pre-tournament Elo rating is a good control precisely because it's measured before the tournament, avoiding bad-control / mediator problems, where a covariate is itself affected by the treatment. Make sure `pre_elo_rating` is captured before any home-field advantage or hosting assignment could influence it.
+
+```{python}
+
+import pandas as pd
+from great_tables import GT, md, style, loc
+
+# --- Params table (as before) ---
+params_df = pd.DataFrame({
+    "Parameter": results.params.index,
+    "Estimate": results.params.values,
+    "Std. Err.": results.std_errors.values,
+    "T-stat": results.tstats.values,
+    "P-value": results.pvalues.values,
+    "Lower CI": results.conf_int()[results.conf_int().columns[0]].values,
+    "Upper CI": results.conf_int()[results.conf_int().columns[1]].values,
+})
+
+# --- Model info table (two columns of stat/value, side by side) ---
+left_stats = {
+    "Dep. Variable": results.model.dependent.vars[0],
+    "Estimator": "PanelOLS",
+    "Cov. Estimator": results._cov_type,
+    "No. Observations": results.nobs,
+    "R-squared": f"{results.rsquared:.4f}",
+    "R-squared (Between)": f"{results.rsquared_between:.4f}",
+    "R-squared (Within)": f"{results.rsquared_within:.4f}",
+    "R-squared (Overall)": f"{results.rsquared_overall:.4f}",
+}
+right_stats = {
+    "Log-likelihood": f"{results.loglik:.2f}",
+    "F-statistic": f"{results.f_statistic.stat:.3f}",
+    "P-value (F-stat)": f"{results.f_statistic.pval:.4f}",
+    "F-statistic (robust)": f"{results.f_statistic_robust.stat:.4f}",
+    "P-value (robust)": f"{results.f_statistic_robust.pval:.4f}",
+    "Entities": results.entity_info.total,
+    "Time periods": results.time_info.total,
+    "Avg Obs (entity)": f"{results.entity_info['mean']:.4f}",
+}
+
+info_df = pd.DataFrame({
+    "Statistic": list(left_stats.keys()) + list(right_stats.keys()),
+    "Value": [str(v) for v in left_stats.values()] + [str(v) for v in right_stats.values()],
+})
+
+info_tbl = (
+    GT(info_df)
+    .tab_header(title="PanelOLS Estimation Summary")
+    .cols_align(align="left", columns="Statistic")
+    .cols_align(align="right", columns="Value")
+    .tab_style(style=style.text(weight="bold"), locations=loc.body(columns="Statistic"))
+    .tab_options(table_width="500px", column_labels_hidden=True)
+)
+
+# --- Params table ---
+params_tbl = (
+    GT(params_df)
+    .tab_header(title="Parameter Estimates")
+    .fmt_number(columns=["Estimate", "Std. Err.", "T-stat", "Lower CI", "Upper CI"], decimals=4)
+    .fmt_scientific(columns=["P-value"], decimals=2)
+    .tab_style(
+        style=style.fill(color="#fff3cd"),
+        locations=loc.body(rows=lambda df: df["P-value"] < 0.05)
+    )
+    .tab_style(style=style.text(weight="bold"), locations=loc.body(columns="Parameter"))
+    .tab_source_note(
+        source_note=md(
+            f"**F-test for Poolability:** F({results.f_pooled.df}, {results.f_pooled.df_denom}) "
+            f"= {results.f_pooled.stat:.4f}, p = {results.f_pooled.pval:.4f}  \n"
+            f"**Included effects:** Entity, Time"
+        )
+    )
+    .tab_options(table_width="500px")
+)
+
+
+
+```
+
+```{python}
+#| label: tbl-model-info
+#| tbl-cap: "PanelOLS model summary statistics"
+
+info_tbl
+```
+
+```{python}
+#| label: tbl-panel-estimates
+#| tbl-cap: "PanelOLS parameter estimates"
+
+params_tbl
+```
+
+# Conclusions
+
+The TWFE estimate suggests hosting the World Cup is associated with a **1.02 goal-differential-per-game increase** (95% CI: 0.55–1.49, p < 0.001) relative to a team's own non-hosting baseline, after absorbing team- and tournament-level fixed effects and controlling for pre-tournament Elo. This is a large effect in practical terms — for context, a team that typically draws (0.0 avg goal diff) would be expected to outscore opponents by roughly a goal a game while hosting.
+
+The pre-tournament Elo control is also significant (p = 0.047) but its coefficient is small (0.002 per Elo point), consistent with Elo capturing gradual team quality rather than being a strong predictor of a single tournament's goal differential.
+
+The model's within-R² (0.079) is modest: fixed effects and Elo explain only a small share of *within-team* variation in tournament performance, which is expected given the high game-to-game variance inherent in short single-elimination-heavy tournaments (avg. ~5 games/team). The **F-test for poolability (p = 0.0004)** rejects the null that entity/time effects are jointly zero, supporting the TWFE specification over pooled OLS.
+
+Taken together, the results are consistent with a genuine home-hosting advantage in the World Cup, though the estimate should be interpreted as an average effect across only **21 hosting instances** — a small effective treatment count that warrants caution before treating the point estimate as precise.
+
+## Limitations & next steps
+
+1. **Small treated-group inference.** With only 21 host-observations clustered among 82 entities, cluster-robust SEs may be unreliable (few-cluster bias). Worth reporting a wild cluster bootstrap or randomization-inference p-value as a robustness check alongside the asymptotic clustered SE.
+
+2. **Two-way clustering / serial correlation check.** Standard errors are currently clustered only on `team_id`. Since hosting years are also correlated across teams within a tournament (e.g., co-hosts, or tournament-specific shocks not fully absorbed by time FE), two-way clustering (entity × year) or at least a robustness check against tournament-clustered SEs would be worth showing.
+
+3. **Recent TWFE-with-heterogeneous-effects literature.** Given repeat "quasi-treatment" isn't at issue here (hosting is close to one-shot per country), the classic negative-weighting critique (Goodman-Bacon/de Chaisemartin) is less of a concern than for staggered-adoption designs — but it's worth noting why, or running a Callaway & Sant'Anna-style estimator as a sensitivity check, since some hosts (e.g. co-hosts, repeat hosts) do reappear in the panel.
