@@ -2,10 +2,10 @@
 title: "Sourcing pre-tournament Elo ratings"
 author: "Rene Valenzuela"
 date: "2026-08-17"
-date-modified: "2026-08-17"
+date-modified: "2026-08-19"
 categories: [data-cleaning]
 execute:
-  freeze: true
+  freeze: false
 ---
 
 # Introduction
@@ -94,6 +94,27 @@ if missing_years:
     elo_ratings = pd.concat([cached_ratings, new_ratings], ignore_index=True)
 else:
     elo_ratings = cached_ratings
+```
+
+# Normalizing country names
+
+```{python}
+normalized_country_names = {'United States':'United States of America', 
+                            'West Germany':'Germany FR',
+                            'East Germany':'Germany DR',
+                            'Ireland':'Republic of Ireland',
+                            'Iran':'IR Iran',
+                            'China':'China PR',
+                            'South Korea':'Republic of Korea',
+                            'North Korea':"Democratic People's Republic of Korea",
+                            'Czechia':'Czech Republic'}
+
+elo_ratings['country'] = elo_ratings['country'].replace(normalized_country_names)
+
+# Replace the appearence of Russia before its creation
+mask = (elo_ratings['year'] <= 1991) & (elo_ratings['country'].str.contains('Russia'))
+elo_ratings.loc[mask, ['country', 'team_code']] = ['Soviet Union', 'SU']
+
 ```
 
 # Output
