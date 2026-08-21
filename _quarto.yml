@@ -3,7 +3,7 @@ project:
 
 website:
   description: "First steps in learning about and applying causal inference to answer causal questions"
-  site-url: https://your-website-url.example.com # you must change this appropriately for RSS feeds to work properly
+  site-url: https://rcvalenzuela.github.io # you must change this appropriately for RSS feeds to work properly
   title: "causal musings"
   navbar:
     right:
