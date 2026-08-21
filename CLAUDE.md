@@ -40,7 +40,6 @@ Create a new directory under `posts/` with an `index.qmd` containing YAML front 
 
 ## Notes
 
-- `site-url` in `_quarto.yml` is still a placeholder (`https://your-website-url.example.com`) and must be set for RSS feeds to work correctly.
 - Navbar links (GitHub, Bluesky) in `_quarto.yml` and social links in `about.qmd` are placeholders and need real URLs.
 
 ## Python
