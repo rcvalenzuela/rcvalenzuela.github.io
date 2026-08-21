@@ -1,0 +1,862 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss  xmlns:atom="http://www.w3.org/2005/Atom" 
+      xmlns:media="http://search.yahoo.com/mrss/" 
+      xmlns:content="http://purl.org/rss/1.0/modules/content/" 
+      xmlns:dc="http://purl.org/dc/elements/1.1/" 
+      version="2.0">
+<channel>
+<title>causal musings</title>
+<link>https://your-website-url.example.com/</link>
+<atom:link href="https://your-website-url.example.com/index.xml" rel="self" type="application/rss+xml"/>
+<description>First steps in learning about and applying causal inference to answer causal questions</description>
+<generator>quarto-1.10.18</generator>
+<lastBuildDate>Sun, 16 Aug 2026 22:00:00 GMT</lastBuildDate>
+<item>
+  <title>Sourcing pre-tournament Elo ratings</title>
+  <dc:creator>Rene Valenzuela</dc:creator>
+  <link>https://your-website-url.example.com/posts/world-cup-data-elo-ratings/</link>
+  <description><![CDATA[ 
+
+
+
+
+
+<section id="introduction" class="level1">
+<h1>Introduction</h1>
+<p>The <a href="../../posts/world-cup-hosting-premium/index.html">World Cup hosting premium analysis</a> controls for each team’s strength going into a tournament via <code>pre_elo_rating</code>. That covariate isn’t part of the Kaggle matches dataset, so it’s sourced separately here, in its own post, for the same reason the match-cleaning steps live in their own post: it keeps the scrape traceable and reproducible independent of any downstream analysis.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Data attribution
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>All Elo ratings on this page are sourced from <a href="https://eloratings.net"><strong>eloratings.net</strong></a>, the World Football Elo Ratings project. All credit for the underlying rating methodology and data collection belongs to that site — this post only documents how the publicly served data is downloaded and reshaped for analysis here.</p>
+</div>
+</div>
+</section>
+<section id="data-source" class="level1">
+<h1>Data source</h1>
+<p><a href="https://eloratings.net">eloratings.net</a> publishes a “starting” Elo snapshot for every year, e.g.&nbsp;<a href="https://eloratings.net/2026_start">https://eloratings.net/2026_start</a>. The page itself renders client-side (a JS grid) and has no public API, but the grid is populated from two plain TSV files that can be read directly:</p>
+<ul>
+<li><code>https://eloratings.net/{year}_start.tsv</code> — one row per team, ranked by rating, with 31 tab-separated columns: rank-change arrow, rank, team code, rating, highest/average/lowest rank and rating, rank/rating changes over the trailing 3 months, 6 months, 1, 2, 5, and 10 years, total matches played (home/away/neutral), wins/losses/draws, and goals for/against.</li>
+<li><code>https://eloratings.net/en.teams.tsv</code> — maps each 2-letter team code to its full country name.</li>
+</ul>
+</section>
+<section id="building-the-panel" class="level1">
+<h1>Building the panel</h1>
+<p>Starting Elo ratings are pulled for every calendar year from 1930 through 2026 — not just World Cup years — and stacked into a single panel, so downstream posts can look up any team’s rating in any year without re-scraping. Years already present in the output file from a previous run are skipped, so re-running this post only hits eloratings.net for new years.</p>
+</section>
+<section id="normalizing-country-names" class="level1">
+<h1>Normalizing country names</h1>
+</section>
+<section id="output" class="level1">
+<h1>Output</h1>
+<p>The combined panel — sourced from <a href="https://eloratings.net">eloratings.net</a> — is written out for downstream use by the data-cleaning and hosting-premium posts:</p>
+</section>
+<section id="visual-check" class="level1">
+<h1>Visual check</h1>
+<p>As a sanity check that the scrape actually worked, here’s Elo rating over time for two teams read straight back from the parquet file:</p>
+<div id="5b0543a0" class="cell" data-execution_count="6">
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="https://your-website-url.example.com/posts/world-cup-data-elo-ratings/index_files/figure-html/cell-7-output-1.png" width="760" height="422" class="figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+
+
+</section>
+
+ ]]></description>
+  <category>data-cleaning</category>
+  <guid>https://your-website-url.example.com/posts/world-cup-data-elo-ratings/</guid>
+  <pubDate>Sun, 16 Aug 2026 22:00:00 GMT</pubDate>
+</item>
+<item>
+  <title>Cleaning the World Cup Matches dataset</title>
+  <dc:creator>Rene Valenzuela</dc:creator>
+  <link>https://your-website-url.example.com/posts/world-cup-data-matches/</link>
+  <description><![CDATA[ 
+
+
+
+
+
+<section id="introduction" class="level1">
+<h1>Introduction</h1>
+<p>This post documents, end to end, how the raw World Cup Matches dataset is cleaned before it’s used in the <a href="../../posts/world-cup-hosting-premium/index.html">World Cup hosting premium analysis</a>. Keeping the cleaning steps in their own post makes them traceable and reproducible independent of any downstream analysis, and the resulting cleaned dataset is what gets published to Kaggle.</p>
+</section>
+<section id="data-sources" class="level1">
+<h1>Data sources</h1>
+<section id="world-cup-hosts" class="level2">
+<h2 class="anchored" data-anchor-id="world-cup-hosts">World cup hosts</h2>
+<p>The host nations for each of the World cups is extracted from <a href="https://en.wikipedia.org/wiki/List_of_FIFA_World_Cup_hosts">Wikipedia</a></p>
+<div id="532baefc" class="cell" data-execution_count="3">
+<div class="cell-output cell-output-display" data-execution_count="3">
+<div id="ippaoywznb" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>
+#ippaoywznb table {
+          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
+          -webkit-font-smoothing: antialiased;
+          -moz-osx-font-smoothing: grayscale;
+        }
+
+#ippaoywznb thead, tbody, tfoot, tr, td, th { border-style: none; }
+ tr { background-color: transparent; }
+#ippaoywznb p { margin: 0; padding: 0; }
+ #ippaoywznb .gt_table { display: table; border-collapse: collapse; line-height: normal; margin-left: auto; margin-right: auto; color: #333333; font-size: 16px; font-weight: normal; font-style: normal; background-color: #FFFFFF; width: auto; border-top-style: solid; border-top-width: 2px; border-top-color: #A8A8A8; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #A8A8A8; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; }
+ #ippaoywznb .gt_caption { padding-top: 4px; padding-bottom: 4px; }
+ #ippaoywznb .gt_title { color: #333333; font-size: 125%; font-weight: initial; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; border-bottom-color: #FFFFFF; border-bottom-width: 0; }
+ #ippaoywznb .gt_subtitle { color: #333333; font-size: 85%; font-weight: initial; padding-top: 3px; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; border-top-color: #FFFFFF; border-top-width: 0; }
+ #ippaoywznb .gt_heading { background-color: #FFFFFF; text-align: center; border-bottom-color: #FFFFFF; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
+ #ippaoywznb .gt_bottom_border { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
+ #ippaoywznb .gt_col_headings { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
+ #ippaoywznb .gt_col_heading { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: bottom; padding-top: 5px; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; overflow-x: hidden; }
+ #ippaoywznb .gt_column_spanner_outer { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; padding-top: 0; padding-bottom: 0; padding-left: 4px; padding-right: 4px; }
+ #ippaoywznb .gt_column_spanner_outer:first-child { padding-left: 0; }
+ #ippaoywznb .gt_column_spanner_outer:last-child { padding-right: 0; }
+ #ippaoywznb .gt_column_spanner { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; vertical-align: bottom; padding-top: 5px; padding-bottom: 5px; overflow-x: hidden; display: inline-block; width: 100%; }
+ #ippaoywznb .gt_spanner_row { border-bottom-style: hidden; }
+ #ippaoywznb .gt_group_heading { padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; text-align: left; }
+ #ippaoywznb .gt_empty_group_heading { padding: 0.5px; color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; vertical-align: middle; }
+ #ippaoywznb .gt_from_md> :first-child { margin-top: 0; }
+ #ippaoywznb .gt_from_md> :last-child { margin-bottom: 0; }
+ #ippaoywznb .gt_row { padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; margin: 10px; border-top-style: solid; border-top-width: 1px; border-top-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; overflow-x: hidden; }
+ #ippaoywznb .gt_stub { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; }
+ #ippaoywznb .gt_indent_1 { text-indent: 5px; }
+ #ippaoywznb .gt_indent_2 { text-indent: calc(5px * 2); }
+ #ippaoywznb .gt_indent_3 { text-indent: calc(5px * 3); }
+ #ippaoywznb .gt_indent_4 { text-indent: calc(5px * 4); }
+ #ippaoywznb .gt_indent_5 { text-indent: calc(5px * 5); }
+ #ippaoywznb .gt_stub_row_group { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; vertical-align: top; }
+ #ippaoywznb .gt_row_group_first td { border-top-width: 2px; }
+ #ippaoywznb .gt_row_group_first th { border-top-width: 2px; }
+ #ippaoywznb .gt_striped { color: #333333; background-color: #F4F4F4; }
+ #ippaoywznb .gt_table_body { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
+ #ippaoywznb .gt_summary_row { color: #333333; background-color: #FFFFFF; text-transform: inherit; padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; }
+ #ippaoywznb .gt_first_summary_row { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; }
+ #ippaoywznb .gt_last_summary_row_top { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
+ #ippaoywznb .gt_grand_summary_row { color: #333333; background-color: #FFFFFF; text-transform: inherit; padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; }
+ #ippaoywznb .gt_first_grand_summary_row_bottom { border-top-style: double; border-top-width: 6px; border-top-color: #D3D3D3; }
+ #ippaoywznb .gt_last_grand_summary_row_top { border-bottom-style: double; border-bottom-width: 6px; border-bottom-color: #D3D3D3; }
+ #ippaoywznb .gt_sourcenotes { color: #333333; background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
+ #ippaoywznb .gt_sourcenote { font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; text-align: left; }
+ #ippaoywznb .gt_left { text-align: left; }
+ #ippaoywznb .gt_center { text-align: center; }
+ #ippaoywznb .gt_right { text-align: right; font-variant-numeric: tabular-nums; }
+ #ippaoywznb .gt_font_normal { font-weight: normal; }
+ #ippaoywznb .gt_font_bold { font-weight: bold; }
+ #ippaoywznb .gt_font_italic { font-style: italic; }
+ #ippaoywznb .gt_super { font-size: 65%; }
+ #ippaoywznb .gt_footnotes { color: font-color(#FFFFFF); background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
+ #ippaoywznb .gt_footnote { margin: 0px; font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; }
+ #ippaoywznb .gt_sourcenotes { color: #333333; background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
+ #ippaoywznb .gt_sourcenote { font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; text-align: left; }
+ #ippaoywznb .gt_footnote_marks { font-size: 75%; vertical-align: 0.4em; position: initial; }
+ #ippaoywznb .gt_asterisk { font-size: 100%; vertical-align: 0; }
+ 
+</style>
+
+<table class="gt_table caption-top table table-sm table-striped small" data-quarto-bootstrap="false">
+<thead>
+<tr class="gt_col_headings header">
+<th id="year" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">year</th>
+<th id="host_nation" class="gt_col_heading gt_columns_bottom_border gt_left" data-quarto-table-cell-role="th" scope="col">host_nation</th>
+<th id="confederation" class="gt_col_heading gt_columns_bottom_border gt_left" data-quarto-table-cell-role="th" scope="col">confederation</th>
+</tr>
+</thead>
+<tbody class="gt_table_body">
+<tr class="odd">
+<td class="gt_row gt_right">1930</td>
+<td class="gt_row gt_left">Uruguay</td>
+<td class="gt_row gt_left">CONMEBOL</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_right">1934</td>
+<td class="gt_row gt_left">Italy</td>
+<td class="gt_row gt_left">UEFA</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_right">1938</td>
+<td class="gt_row gt_left">France</td>
+<td class="gt_row gt_left">UEFA</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_right">1950</td>
+<td class="gt_row gt_left">Brazil</td>
+<td class="gt_row gt_left">CONMEBOL</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_right">1954</td>
+<td class="gt_row gt_left">Switzerland</td>
+<td class="gt_row gt_left">UEFA</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_right">1958</td>
+<td class="gt_row gt_left">Sweden</td>
+<td class="gt_row gt_left">UEFA</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_right">1962</td>
+<td class="gt_row gt_left">Chile</td>
+<td class="gt_row gt_left">CONMEBOL</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_right">1966</td>
+<td class="gt_row gt_left">England</td>
+<td class="gt_row gt_left">UEFA</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_right">1970</td>
+<td class="gt_row gt_left">Mexico</td>
+<td class="gt_row gt_left">CONCACAF</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_right">1974</td>
+<td class="gt_row gt_left">Germany FR</td>
+<td class="gt_row gt_left">UEFA</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_right">1978</td>
+<td class="gt_row gt_left">Argentina</td>
+<td class="gt_row gt_left">CONMEBOL</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_right">1982</td>
+<td class="gt_row gt_left">Spain</td>
+<td class="gt_row gt_left">UEFA</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_right">1986</td>
+<td class="gt_row gt_left">Mexico</td>
+<td class="gt_row gt_left">CONCACAF</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_right">1990</td>
+<td class="gt_row gt_left">Italy</td>
+<td class="gt_row gt_left">UEFA</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_right">1994</td>
+<td class="gt_row gt_left">United States of America</td>
+<td class="gt_row gt_left">CONCACAF</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_right">1998</td>
+<td class="gt_row gt_left">France</td>
+<td class="gt_row gt_left">UEFA</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_right">2002</td>
+<td class="gt_row gt_left">Republic of Korea</td>
+<td class="gt_row gt_left">AFC</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_right">2002</td>
+<td class="gt_row gt_left">Japan</td>
+<td class="gt_row gt_left">AFC</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_right">2006</td>
+<td class="gt_row gt_left">Germany</td>
+<td class="gt_row gt_left">UEFA</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_right">2010</td>
+<td class="gt_row gt_left">South Africa</td>
+<td class="gt_row gt_left">CAF</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_right">2014</td>
+<td class="gt_row gt_left">Brazil</td>
+<td class="gt_row gt_left">CONMEBOL</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_right">2018</td>
+<td class="gt_row gt_left">Russia</td>
+<td class="gt_row gt_left">UEFA</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_right">2022</td>
+<td class="gt_row gt_left">Qatar</td>
+<td class="gt_row gt_left">AFC</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_right">2026</td>
+<td class="gt_row gt_left">Canada</td>
+<td class="gt_row gt_left">CONCACAF</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_right">2026</td>
+<td class="gt_row gt_left">United States of America</td>
+<td class="gt_row gt_left">CONCACAF</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_right">2026</td>
+<td class="gt_row gt_left">Mexico</td>
+<td class="gt_row gt_left">CONCACAF</td>
+</tr>
+</tbody>
+</table>
+
+
+</div>
+</div>
+</div>
+</section>
+<section id="world-cup-games" class="level2">
+<h2 class="anchored" data-anchor-id="world-cup-games">World cup games</h2>
+<p>The raw data comes from the <a href="https://www.kaggle.com/datasets/abecklas/fifa-world-cup">FIFA World Cup dataset</a> on Kaggle. Specifically the <code>WorldCupMatches.csv</code> dataset.</p>
+<section id="cleaning-steps" class="level3">
+<h3 class="anchored" data-anchor-id="cleaning-steps">Cleaning steps</h3>
+<section id="manual-edits" class="level4">
+<h4 class="anchored" data-anchor-id="manual-edits">Manual edits</h4>
+<ul>
+<li>Some records had the dates recorded as June/July instead of Jun/Jul.&nbsp;These records were manually modified in the <code>.csv</code> file to ease further processing.</li>
+<li>In the 1982 World Cup the second group stage games were manually changed from <code>1</code> … <code>4</code> to <code>A</code> … <code>D</code>, so the <code>stage</code> labels are consistent across tournament years and need to be normalized before they can be used.</li>
+<li>Manuall deleted extra string in 3 countries Bosnia and Herzegovina</li>
+</ul>
+</section>
+<section id="deduplication" class="level4">
+<h4 class="anchored" data-anchor-id="deduplication">Deduplication</h4>
+</section>
+<section id="column-names-normalization" class="level4">
+<h4 class="anchored" data-anchor-id="column-names-normalization">Column names normalization</h4>
+<p>The raw column names are verbose and inconsistently cased, so they’re mapped to short, <code>snake_case</code> names:</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Original name</th>
+<th>Normalized name</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Year</td>
+<td>year</td>
+</tr>
+<tr class="even">
+<td>Datetime</td>
+<td>match_start</td>
+</tr>
+<tr class="odd">
+<td>Stage</td>
+<td>stage</td>
+</tr>
+<tr class="even">
+<td>Stadium</td>
+<td>venue</td>
+</tr>
+<tr class="odd">
+<td>City</td>
+<td>city</td>
+</tr>
+<tr class="even">
+<td>Home Team Name</td>
+<td>home_team</td>
+</tr>
+<tr class="odd">
+<td>Away Team Name</td>
+<td>away_team</td>
+</tr>
+<tr class="even">
+<td>Home Team Goals</td>
+<td>home_ft_goals</td>
+</tr>
+<tr class="odd">
+<td>Away Team Goals</td>
+<td>away_ft_goals</td>
+</tr>
+<tr class="even">
+<td>Win conditions</td>
+<td>resolution_type</td>
+</tr>
+<tr class="odd">
+<td>Attendance</td>
+<td>attendance</td>
+</tr>
+<tr class="even">
+<td>Half-time Home Goals</td>
+<td>home_ht_goals</td>
+</tr>
+<tr class="odd">
+<td>Half-time Away Goals</td>
+<td>away_ht_goals</td>
+</tr>
+<tr class="even">
+<td>Referee</td>
+<td>referee</td>
+</tr>
+<tr class="odd">
+<td>Assistant 1</td>
+<td>assistant_1</td>
+</tr>
+<tr class="even">
+<td>Assistant 2</td>
+<td>assistant_2</td>
+</tr>
+<tr class="odd">
+<td>RoundID</td>
+<td>round_id</td>
+</tr>
+<tr class="even">
+<td>MatchID</td>
+<td>match_id</td>
+</tr>
+<tr class="odd">
+<td>Home Team Initials</td>
+<td>home_initials</td>
+</tr>
+<tr class="even">
+<td>Away Team Initials</td>
+<td>away_initials</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="type-normalization" class="level4">
+<h4 class="anchored" data-anchor-id="type-normalization">Type normalization</h4>
+<section id="integers" class="level5">
+<h5 class="anchored" data-anchor-id="integers">Integers</h5>
+</section>
+<section id="datetime" class="level5">
+<h5 class="anchored" data-anchor-id="datetime">Datetime</h5>
+</section>
+<section id="categorical" class="level5">
+<h5 class="anchored" data-anchor-id="categorical">Categorical</h5>
+<section id="stage" class="level6">
+<h6 class="anchored" data-anchor-id="stage">Stage</h6>
+</section>
+<section id="resolution-type" class="level6">
+<h6 class="anchored" data-anchor-id="resolution-type">Resolution type</h6>
+</section>
+<section id="home-team-and-away-team" class="level6">
+<h6 class="anchored" data-anchor-id="home-team-and-away-team">Home team and Away team</h6>
+</section>
+</section>
+</section>
+</section>
+</section>
+</section>
+<section id="output" class="level1">
+<h1>Output</h1>
+<p>The cleaned dataset is written out for downstream use (and eventual publication to Kaggle):</p>
+
+
+</section>
+
+ ]]></description>
+  <category>data-cleaning</category>
+  <guid>https://your-website-url.example.com/posts/world-cup-data-matches/</guid>
+  <pubDate>Thu, 13 Aug 2026 22:00:00 GMT</pubDate>
+</item>
+<item>
+  <title>Does hosting the World cup boost performance?</title>
+  <dc:creator>Rene Valenzuela</dc:creator>
+  <link>https://your-website-url.example.com/posts/world-cup-hosting-premium/</link>
+  <description><![CDATA[ 
+
+
+
+
+
+<section id="introduction" class="level1">
+<h1>Introduction</h1>
+<p>How many extra goal-difference points or wins does a national team gain purely from the <strong>home advantage</strong> of hosting the World Cup?</p>
+<p>Simply comparing host teams to non-host teams, or comparing a host team’s performance in its hosting year to other years without controls, may produce heavily biased results.</p>
+</section>
+<section id="model-definition" class="level1">
+<h1>Model definition</h1>
+<section id="reframing-causal-question" class="level2">
+<h2 class="anchored" data-anchor-id="reframing-causal-question">Reframing causal question</h2>
+<p>Following the <a href="https://en.wikipedia.org/wiki/PICO_process">PICO framework</a> we identify:</p>
+<ul>
+<li><strong>Population</strong>: Every team that has participated in a World cup</li>
+<li><strong>Intervention</strong>: Selecting one of the teams as hosts of the world cup in year <img src="https://latex.codecogs.com/png.latex?T">.</li>
+<li><strong>Control group</strong>: Similar elite/mid-tier nations that qualified for year T but did not host.</li>
+<li><strong>Outcome</strong>: We choose first <em>Average goal-difference over the tournament</em> as the outcome variable, i.e., <img src="https://latex.codecogs.com/png.latex?%0A%5Ctext%7Bavg%5C_goal%5C_diff%7D%20=%20%5Cfrac%7B%5Ctext%7Bgoals%5C_for%7D%20-%20%5Ctext%7Bgoals%5C_against%7D%7D%7B%5Ctext%7Bn%5C_games%7D%7D%0A"></li>
+</ul>
+<p>We fit the classical TWFE model by estimating the following equation via Ordinary Least Squares (OLS): <img src="https://latex.codecogs.com/png.latex?%0AY_%7Bit%7D%20=%20%5Cbeta_%7B0%7D%20+%20%5Cbeta_%7B1%7D%20%5Ctext%7Bis%5C_host%7D_%7Bit%7D%20+%20%5Cbeta_%7B2%7D%5Ctext%7Bpre%5C_elo%5C_rating%7D%20+%20%5Cgamma_%7Bi%7D%20+%20%5Cdelta_%7Bt%7D%20+%20%5Cepsilon_%7Bit%7D%0A"></p>
+<ul>
+<li><strong>Entity fixed effects (<img src="https://latex.codecogs.com/png.latex?%5Cgamma_i">)</strong>: Implemented via <code>team_id</code>. This absorbs all time-invariant, team-specific unobservables — historical football culture, baseline national infrastructure, long-term geographic advantages, and the like.</li>
+<li><strong>Time fixed effects (<img src="https://latex.codecogs.com/png.latex?%5Cdelta_t">)</strong>: Implemented via <code>year</code>. This absorbs team-invariant, time-specific shocks such as changes in global tournament rules, ball design, tactical trends of a given era, or macro weather conditions.</li>
+<li><strong>The key estimator (<img src="https://latex.codecogs.com/png.latex?%5Cbeta_1">)</strong>: <code>is_host</code> is the treatment indicator. Because unit and time effects are partialled out, <img src="https://latex.codecogs.com/png.latex?%5Cbeta_1"> estimates the effect of hosting on goal differential per game, comparing a team to its own non-hosting baseline while controlling for tournament-wide trends and time-varying strength (<code>pre_elo_rating</code>).</li>
+</ul>
+<p>Pre-tournament Elo rating is a good control precisely because it’s measured before the tournament, avoiding bad-control / mediator problems, where a covariate is itself affected by the treatment. Make sure <code>pre_elo_rating</code> is captured before any home-field advantage or hosting assignment could influence it.</p>
+</section>
+</section>
+<section id="methodology" class="level1">
+<h1>Methodology</h1>
+</section>
+<section id="dataset" class="level1">
+<h1>Dataset</h1>
+<p>Difference-in-differences (DiD) measures the effect of a treatment by comparing the change over time in a treatment group against the change over time in a control group.</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 18%">
+<col style="width: 12%">
+<col style="width: 46%">
+<col style="width: 24%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Variable Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Role in Causal Inference</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>team_id</td>
+<td>Categorical</td>
+<td>Country name/code (e.g., BRA, FRA)</td>
+<td>Entity ID</td>
+</tr>
+<tr class="even">
+<td>year</td>
+<td>Temporal</td>
+<td>World Cup Year (1930–2026)</td>
+<td>Time ID</td>
+</tr>
+<tr class="odd">
+<td>is_host</td>
+<td>Binary</td>
+<td>(0/1)1 if hosting that tournament, 0 otherwise</td>
+<td>Treatment (D)</td>
+</tr>
+<tr class="even">
+<td>pre_elo_rating</td>
+<td>Numeric</td>
+<td>FIFA ranking (or Elo rating) 6 months prior</td>
+<td>Pre-treatment Covariate</td>
+</tr>
+</tbody>
+</table>
+<p>The raw dataset is cleaned in separates data-cleaning posts for the <a href="../../posts/world-cup-data-matches/index.html">matches</a> and for the <a href="../../posts/world-cup-data-matches/index.html">ELO ratings</a>, which documents every transformation — column renaming, deduplication, dtype coercion, and stage-label normalization across World Cup rule changes — and produces the cleaned datasets used below.</p>
+<section id="team-level-long-dataset" class="level2">
+<h2 class="anchored" data-anchor-id="team-level-long-dataset">Team-level (long) dataset</h2>
+<p>For the hosting-premium analysis, each match needs to become two team-level observations rather than one row with a home and away side. <code>wc_games</code> is reshaped into <code>wc_games_long</code>, with one row per team per match (<code>match_id</code>, <code>year</code>, <code>team</code>, <code>goals_for</code>, <code>goals_against</code>), home row first:</p>
+</section>
+</section>
+<section id="fitting-the-model" class="level1">
+<h1>Fitting the model</h1>
+<p>One possibility in fitting the model was using <a href="https://www.statsmodels.org/stable/user-guide.html">statsmodels</a> and <code>C(team_id)</code>. However, this forces to explicitly construct a matrix column for every nation in the dataset — the Least Squares Dummy Variable (LSDV) approach. As the number of teams grows, inverting the <img src="https://latex.codecogs.com/png.latex?(X%5ET%20X)"> matrix becomes slow, memory-heavy, and clutters the summary table with hundreds of unwanted coefficient rows.</p>
+<p>We choose instead an alternative approach where we use <a href="https://bashtage.github.io/linearmodels/panel/panel/linearmodels.panel.model.PanelOLS.html#linearmodels.panel.model.PanelOLS">linearmodels</a>, which de-means and absorbs fixed effects without ever constructing dummy variables.</p>
+<div class="cell" data-execution_count="11">
+<div id="tbl-model-info" class="cell quarto-float quarto-figure quarto-figure-center anchored" data-execution_count="11">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-model-info-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;1: PanelOLS model summary statistics
+</figcaption>
+<div aria-describedby="tbl-model-info-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="cell-output cell-output-display" data-execution_count="11">
+<div id="vdkfdvajkj" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>
+#vdkfdvajkj table {
+          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
+          -webkit-font-smoothing: antialiased;
+          -moz-osx-font-smoothing: grayscale;
+        }
+
+#vdkfdvajkj thead, tbody, tfoot, tr, td, th { border-style: none; }
+ tr { background-color: transparent; }
+#vdkfdvajkj p { margin: 0; padding: 0; }
+ #vdkfdvajkj .gt_table { display: table; border-collapse: collapse; line-height: normal; margin-left: auto; margin-right: auto; color: #333333; font-size: 16px; font-weight: normal; font-style: normal; background-color: #FFFFFF; width: 500px; border-top-style: solid; border-top-width: 2px; border-top-color: #A8A8A8; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #A8A8A8; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; }
+ #vdkfdvajkj .gt_caption { padding-top: 4px; padding-bottom: 4px; }
+ #vdkfdvajkj .gt_title { color: #333333; font-size: 125%; font-weight: initial; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; border-bottom-color: #FFFFFF; border-bottom-width: 0; }
+ #vdkfdvajkj .gt_subtitle { color: #333333; font-size: 85%; font-weight: initial; padding-top: 3px; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; border-top-color: #FFFFFF; border-top-width: 0; }
+ #vdkfdvajkj .gt_heading { background-color: #FFFFFF; text-align: center; border-bottom-color: #FFFFFF; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
+ #vdkfdvajkj .gt_bottom_border { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
+ #vdkfdvajkj .gt_col_headings { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
+ #vdkfdvajkj .gt_col_heading { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: bottom; padding-top: 5px; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; overflow-x: hidden; }
+ #vdkfdvajkj .gt_column_spanner_outer { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; padding-top: 0; padding-bottom: 0; padding-left: 4px; padding-right: 4px; }
+ #vdkfdvajkj .gt_column_spanner_outer:first-child { padding-left: 0; }
+ #vdkfdvajkj .gt_column_spanner_outer:last-child { padding-right: 0; }
+ #vdkfdvajkj .gt_column_spanner { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; vertical-align: bottom; padding-top: 5px; padding-bottom: 5px; overflow-x: hidden; display: inline-block; width: 100%; }
+ #vdkfdvajkj .gt_spanner_row { border-bottom-style: hidden; }
+ #vdkfdvajkj .gt_group_heading { padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; text-align: left; }
+ #vdkfdvajkj .gt_empty_group_heading { padding: 0.5px; color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; vertical-align: middle; }
+ #vdkfdvajkj .gt_from_md> :first-child { margin-top: 0; }
+ #vdkfdvajkj .gt_from_md> :last-child { margin-bottom: 0; }
+ #vdkfdvajkj .gt_row { padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; margin: 10px; border-top-style: solid; border-top-width: 1px; border-top-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; overflow-x: hidden; }
+ #vdkfdvajkj .gt_stub { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; }
+ #vdkfdvajkj .gt_indent_1 { text-indent: 5px; }
+ #vdkfdvajkj .gt_indent_2 { text-indent: calc(5px * 2); }
+ #vdkfdvajkj .gt_indent_3 { text-indent: calc(5px * 3); }
+ #vdkfdvajkj .gt_indent_4 { text-indent: calc(5px * 4); }
+ #vdkfdvajkj .gt_indent_5 { text-indent: calc(5px * 5); }
+ #vdkfdvajkj .gt_stub_row_group { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; vertical-align: top; }
+ #vdkfdvajkj .gt_row_group_first td { border-top-width: 2px; }
+ #vdkfdvajkj .gt_row_group_first th { border-top-width: 2px; }
+ #vdkfdvajkj .gt_striped { color: #333333; background-color: #F4F4F4; }
+ #vdkfdvajkj .gt_table_body { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
+ #vdkfdvajkj .gt_summary_row { color: #333333; background-color: #FFFFFF; text-transform: inherit; padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; }
+ #vdkfdvajkj .gt_first_summary_row { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; }
+ #vdkfdvajkj .gt_last_summary_row_top { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
+ #vdkfdvajkj .gt_grand_summary_row { color: #333333; background-color: #FFFFFF; text-transform: inherit; padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; }
+ #vdkfdvajkj .gt_first_grand_summary_row_bottom { border-top-style: double; border-top-width: 6px; border-top-color: #D3D3D3; }
+ #vdkfdvajkj .gt_last_grand_summary_row_top { border-bottom-style: double; border-bottom-width: 6px; border-bottom-color: #D3D3D3; }
+ #vdkfdvajkj .gt_sourcenotes { color: #333333; background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
+ #vdkfdvajkj .gt_sourcenote { font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; text-align: left; }
+ #vdkfdvajkj .gt_left { text-align: left; }
+ #vdkfdvajkj .gt_center { text-align: center; }
+ #vdkfdvajkj .gt_right { text-align: right; font-variant-numeric: tabular-nums; }
+ #vdkfdvajkj .gt_font_normal { font-weight: normal; }
+ #vdkfdvajkj .gt_font_bold { font-weight: bold; }
+ #vdkfdvajkj .gt_font_italic { font-style: italic; }
+ #vdkfdvajkj .gt_super { font-size: 65%; }
+ #vdkfdvajkj .gt_footnotes { color: font-color(#FFFFFF); background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
+ #vdkfdvajkj .gt_footnote { margin: 0px; font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; }
+ #vdkfdvajkj .gt_sourcenotes { color: #333333; background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
+ #vdkfdvajkj .gt_sourcenote { font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; text-align: left; }
+ #vdkfdvajkj .gt_footnote_marks { font-size: 75%; vertical-align: 0.4em; position: initial; }
+ #vdkfdvajkj .gt_asterisk { font-size: 100%; vertical-align: 0; }
+ 
+</style>
+
+<table class="gt_table cell caption-top table table-sm table-striped small" data-quarto-bootstrap="false">
+<thead>
+<tr class="gt_heading header">
+<td colspan="2" class="gt_heading gt_title gt_font_normal">PanelOLS Estimation Summary</td>
+</tr>
+</thead>
+<tbody class="gt_table_body">
+<tr class="odd">
+<td class="gt_row gt_left" style="font-weight: bold">Dep. Variable</td>
+<td class="gt_row gt_right">avg_goal_diff</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" style="font-weight: bold">Estimator</td>
+<td class="gt_row gt_right">PanelOLS</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" style="font-weight: bold">Cov. Estimator</td>
+<td class="gt_row gt_right">Clustered</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" style="font-weight: bold">No. Observations</td>
+<td class="gt_row gt_right">425</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" style="font-weight: bold">R-squared</td>
+<td class="gt_row gt_right">0.0696</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" style="font-weight: bold">R-squared (Between)</td>
+<td class="gt_row gt_right">-7.5547</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" style="font-weight: bold">R-squared (Within)</td>
+<td class="gt_row gt_right">0.0791</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" style="font-weight: bold">R-squared (Overall)</td>
+<td class="gt_row gt_right">-7.4274</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" style="font-weight: bold">Log-likelihood</td>
+<td class="gt_row gt_right">-576.14</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" style="font-weight: bold">F-statistic</td>
+<td class="gt_row gt_right">12.052</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" style="font-weight: bold">P-value (F-stat)</td>
+<td class="gt_row gt_right">0.0000</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" style="font-weight: bold">F-statistic (robust)</td>
+<td class="gt_row gt_right">9.5381</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" style="font-weight: bold">P-value (robust)</td>
+<td class="gt_row gt_right">0.0001</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" style="font-weight: bold">Entities</td>
+<td class="gt_row gt_right">82.0</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" style="font-weight: bold">Time periods</td>
+<td class="gt_row gt_right">20.0</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" style="font-weight: bold">Avg Obs (entity)</td>
+<td class="gt_row gt_right">5.1829</td>
+</tr>
+</tbody>
+</table>
+
+
+</div>
+</div>
+</div>
+</figure>
+</div>
+</div>
+<div class="cell" data-execution_count="12">
+<div id="tbl-panel-estimates" class="cell quarto-float quarto-figure quarto-figure-center anchored" data-execution_count="12">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-panel-estimates-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;2: PanelOLS parameter estimates
+</figcaption>
+<div aria-describedby="tbl-panel-estimates-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="cell-output cell-output-display" data-execution_count="12">
+<div id="gchknttjli" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>
+#gchknttjli table {
+          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
+          -webkit-font-smoothing: antialiased;
+          -moz-osx-font-smoothing: grayscale;
+        }
+
+#gchknttjli thead, tbody, tfoot, tr, td, th { border-style: none; }
+ tr { background-color: transparent; }
+#gchknttjli p { margin: 0; padding: 0; }
+ #gchknttjli .gt_table { display: table; border-collapse: collapse; line-height: normal; margin-left: auto; margin-right: auto; color: #333333; font-size: 16px; font-weight: normal; font-style: normal; background-color: #FFFFFF; width: 500px; border-top-style: solid; border-top-width: 2px; border-top-color: #A8A8A8; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #A8A8A8; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; }
+ #gchknttjli .gt_caption { padding-top: 4px; padding-bottom: 4px; }
+ #gchknttjli .gt_title { color: #333333; font-size: 125%; font-weight: initial; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; border-bottom-color: #FFFFFF; border-bottom-width: 0; }
+ #gchknttjli .gt_subtitle { color: #333333; font-size: 85%; font-weight: initial; padding-top: 3px; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; border-top-color: #FFFFFF; border-top-width: 0; }
+ #gchknttjli .gt_heading { background-color: #FFFFFF; text-align: center; border-bottom-color: #FFFFFF; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
+ #gchknttjli .gt_bottom_border { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
+ #gchknttjli .gt_col_headings { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
+ #gchknttjli .gt_col_heading { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: bottom; padding-top: 5px; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; overflow-x: hidden; }
+ #gchknttjli .gt_column_spanner_outer { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; padding-top: 0; padding-bottom: 0; padding-left: 4px; padding-right: 4px; }
+ #gchknttjli .gt_column_spanner_outer:first-child { padding-left: 0; }
+ #gchknttjli .gt_column_spanner_outer:last-child { padding-right: 0; }
+ #gchknttjli .gt_column_spanner { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; vertical-align: bottom; padding-top: 5px; padding-bottom: 5px; overflow-x: hidden; display: inline-block; width: 100%; }
+ #gchknttjli .gt_spanner_row { border-bottom-style: hidden; }
+ #gchknttjli .gt_group_heading { padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; text-align: left; }
+ #gchknttjli .gt_empty_group_heading { padding: 0.5px; color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; vertical-align: middle; }
+ #gchknttjli .gt_from_md> :first-child { margin-top: 0; }
+ #gchknttjli .gt_from_md> :last-child { margin-bottom: 0; }
+ #gchknttjli .gt_row { padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; margin: 10px; border-top-style: solid; border-top-width: 1px; border-top-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; overflow-x: hidden; }
+ #gchknttjli .gt_stub { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; }
+ #gchknttjli .gt_indent_1 { text-indent: 5px; }
+ #gchknttjli .gt_indent_2 { text-indent: calc(5px * 2); }
+ #gchknttjli .gt_indent_3 { text-indent: calc(5px * 3); }
+ #gchknttjli .gt_indent_4 { text-indent: calc(5px * 4); }
+ #gchknttjli .gt_indent_5 { text-indent: calc(5px * 5); }
+ #gchknttjli .gt_stub_row_group { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; vertical-align: top; }
+ #gchknttjli .gt_row_group_first td { border-top-width: 2px; }
+ #gchknttjli .gt_row_group_first th { border-top-width: 2px; }
+ #gchknttjli .gt_striped { color: #333333; background-color: #F4F4F4; }
+ #gchknttjli .gt_table_body { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
+ #gchknttjli .gt_summary_row { color: #333333; background-color: #FFFFFF; text-transform: inherit; padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; }
+ #gchknttjli .gt_first_summary_row { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; }
+ #gchknttjli .gt_last_summary_row_top { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
+ #gchknttjli .gt_grand_summary_row { color: #333333; background-color: #FFFFFF; text-transform: inherit; padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; }
+ #gchknttjli .gt_first_grand_summary_row_bottom { border-top-style: double; border-top-width: 6px; border-top-color: #D3D3D3; }
+ #gchknttjli .gt_last_grand_summary_row_top { border-bottom-style: double; border-bottom-width: 6px; border-bottom-color: #D3D3D3; }
+ #gchknttjli .gt_sourcenotes { color: #333333; background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
+ #gchknttjli .gt_sourcenote { font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; text-align: left; }
+ #gchknttjli .gt_left { text-align: left; }
+ #gchknttjli .gt_center { text-align: center; }
+ #gchknttjli .gt_right { text-align: right; font-variant-numeric: tabular-nums; }
+ #gchknttjli .gt_font_normal { font-weight: normal; }
+ #gchknttjli .gt_font_bold { font-weight: bold; }
+ #gchknttjli .gt_font_italic { font-style: italic; }
+ #gchknttjli .gt_super { font-size: 65%; }
+ #gchknttjli .gt_footnotes { color: font-color(#FFFFFF); background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
+ #gchknttjli .gt_footnote { margin: 0px; font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; }
+ #gchknttjli .gt_sourcenotes { color: #333333; background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
+ #gchknttjli .gt_sourcenote { font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; text-align: left; }
+ #gchknttjli .gt_footnote_marks { font-size: 75%; vertical-align: 0.4em; position: initial; }
+ #gchknttjli .gt_asterisk { font-size: 100%; vertical-align: 0; }
+ 
+</style>
+
+<table class="gt_table cell caption-top table table-sm table-striped small" data-quarto-bootstrap="false">
+<colgroup>
+<col style="width: 14%">
+<col style="width: 14%">
+<col style="width: 14%">
+<col style="width: 14%">
+<col style="width: 14%">
+<col style="width: 14%">
+<col style="width: 14%">
+</colgroup>
+<thead>
+<tr class="gt_heading header">
+<td colspan="7" class="gt_heading gt_title gt_font_normal">Parameter Estimates</td>
+</tr>
+<tr class="gt_col_headings even">
+<th id="Parameter" class="gt_col_heading gt_columns_bottom_border gt_left" data-quarto-table-cell-role="th" scope="col">Parameter</th>
+<th id="Estimate" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">Estimate</th>
+<th id="Std.-Err." class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">Std. Err.</th>
+<th id="T-stat" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">T-stat</th>
+<th id="P-value" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">P-value</th>
+<th id="Lower-CI" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">Lower CI</th>
+<th id="Upper-CI" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">Upper CI</th>
+</tr>
+</thead>
+<tbody class="gt_table_body">
+<tr class="odd">
+<td class="gt_row gt_left" style="background-color: #fff3cd; font-weight: bold">is_host</td>
+<td class="gt_row gt_right" style="background-color: #fff3cd">1.0197</td>
+<td class="gt_row gt_right" style="background-color: #fff3cd">0.2399</td>
+<td class="gt_row gt_right" style="background-color: #fff3cd">4.2500</td>
+<td class="gt_row gt_right" style="background-color: #fff3cd">2.80 × 10<sup>−5</sup></td>
+<td class="gt_row gt_right" style="background-color: #fff3cd">0.5477</td>
+<td class="gt_row gt_right" style="background-color: #fff3cd">1.4918</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" style="background-color: #fff3cd; font-weight: bold">pre_elo_rating</td>
+<td class="gt_row gt_right" style="background-color: #fff3cd">0.0020</td>
+<td class="gt_row gt_right" style="background-color: #fff3cd">0.0010</td>
+<td class="gt_row gt_right" style="background-color: #fff3cd">1.9982</td>
+<td class="gt_row gt_right" style="background-color: #fff3cd">4.65 × 10<sup>−2</sup></td>
+<td class="gt_row gt_right" style="background-color: #fff3cd">0.0000</td>
+<td class="gt_row gt_right" style="background-color: #fff3cd">0.0039</td>
+</tr>
+</tbody><tfoot>
+<tr class="gt_sourcenotes odd">
+<td colspan="7" class="gt_sourcenote"><span class="gt_from_md"><strong>F-test for Poolability:</strong> F(100, 322) = 1.6774, p = 0.0004<br>
+<strong>Included effects:</strong> Entity, Time</span></td>
+</tr>
+</tfoot>
+
+</table>
+
+
+</div>
+</div>
+</div>
+</figure>
+</div>
+</div>
+</section>
+<section id="conclusions" class="level1">
+<h1>Conclusions</h1>
+<p>The TWFE estimate suggests hosting the World Cup is associated with a <strong>1.02 goal-differential-per-game increase</strong> (95% CI: 0.55–1.49, p &lt; 0.001) relative to a team’s own non-hosting baseline, after absorbing team- and tournament-level fixed effects and controlling for pre-tournament Elo. This is a large effect in practical terms — for context, a team that typically draws (0.0 avg goal diff) would be expected to outscore opponents by roughly a goal a game while hosting.</p>
+<p>The pre-tournament Elo control is also significant (p = 0.047) but its coefficient is small (0.002 per Elo point), consistent with Elo capturing gradual team quality rather than being a strong predictor of a single tournament’s goal differential.</p>
+<p>The model’s within-R² (0.079) is modest: fixed effects and Elo explain only a small share of <em>within-team</em> variation in tournament performance, which is expected given the high game-to-game variance inherent in short single-elimination-heavy tournaments (avg. ~5 games/team). The <strong>F-test for poolability (p = 0.0004)</strong> rejects the null that entity/time effects are jointly zero, supporting the TWFE specification over pooled OLS.</p>
+<p>Taken together, the results are consistent with a genuine home-hosting advantage in the World Cup, though the estimate should be interpreted as an average effect across only <strong>21 hosting instances</strong> — a small effective treatment count that warrants caution before treating the point estimate as precise.</p>
+<section id="limitations-next-steps" class="level2">
+<h2 class="anchored" data-anchor-id="limitations-next-steps">Limitations &amp; next steps</h2>
+<ol type="1">
+<li><p><strong>Small treated-group inference.</strong> With only 21 host-observations clustered among 82 entities, cluster-robust SEs may be unreliable (few-cluster bias). Worth reporting a wild cluster bootstrap or randomization-inference p-value as a robustness check alongside the asymptotic clustered SE.</p></li>
+<li><p><strong>Two-way clustering / serial correlation check.</strong> Standard errors are currently clustered only on <code>team_id</code>. Since hosting years are also correlated across teams within a tournament (e.g., co-hosts, or tournament-specific shocks not fully absorbed by time FE), two-way clustering (entity × year) or at least a robustness check against tournament-clustered SEs would be worth showing.</p></li>
+<li><p><strong>Recent TWFE-with-heterogeneous-effects literature.</strong> Given repeat “quasi-treatment” isn’t at issue here (hosting is close to one-shot per country), the classic negative-weighting critique (Goodman-Bacon/de Chaisemartin) is less of a concern than for staggered-adoption designs — but it’s worth noting why, or running a Callaway &amp; Sant’Anna-style estimator as a sensitivity check, since some hosts (e.g.&nbsp;co-hosts, repeat hosts) do reappear in the panel.</p></li>
+</ol>
+
+
+</section>
+</section>
+
+ ]]></description>
+  <category>difference-in-differences</category>
+  <guid>https://your-website-url.example.com/posts/world-cup-hosting-premium/</guid>
+  <pubDate>Tue, 11 Aug 2026 22:00:00 GMT</pubDate>
+  <media:content url="https://your-website-url.example.com/posts/world-cup-hosting-premium/world_cup_trophy.jpg" medium="image" type="image/jpeg"/>
+</item>
+</channel>
+</rss>

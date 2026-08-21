@@ -1,0 +1,72 @@
+[
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "causal musings",
+    "section": "",
+    "text": "Does hosting the World cup boost performance?\n\n\n\ndifference-in-differences\n\n\n\n\n\n\nRene Valenzuela\n\n\nAug 20, 2026\n\n\n\n\n\n\n\n\n\n\n\n\nSourcing pre-tournament Elo ratings\n\n\n\ndata-cleaning\n\n\n\n\n\n\nRene Valenzuela\n\n\nAug 19, 2026\n\n\n\n\n\n\n\n\n\n\n\n\nCleaning the World Cup Matches dataset\n\n\n\ndata-cleaning\n\n\n\n\n\n\nRene Valenzuela\n\n\nAug 19, 2026\n\n\n\n\n\nNo matching items"
+  },
+  {
+    "objectID": "posts/world-cup-hosting-premium/index.html",
+    "href": "posts/world-cup-hosting-premium/index.html",
+    "title": "Does hosting the World cup boost performance?",
+    "section": "",
+    "text": "How many extra goal-difference points or wins does a national team gain purely from the home advantage of hosting the World Cup?\nSimply comparing host teams to non-host teams, or comparing a host team’s performance in its hosting year to other years without controls, may produce heavily biased results."
+  },
+  {
+    "objectID": "posts/world-cup-hosting-premium/index.html#reframing-causal-question",
+    "href": "posts/world-cup-hosting-premium/index.html#reframing-causal-question",
+    "title": "Does hosting the World cup boost performance?",
+    "section": "Reframing causal question",
+    "text": "Reframing causal question\nFollowing the PICO framework we identify:\n\nPopulation: Every team that has participated in a World cup\nIntervention: Selecting one of the teams as hosts of the world cup in year \\(T\\).\nControl group: Similar elite/mid-tier nations that qualified for year T but did not host.\nOutcome: We choose first Average goal-difference over the tournament as the outcome variable, i.e., \\[\n\\text{avg\\_goal\\_diff} = \\frac{\\text{goals\\_for} - \\text{goals\\_against}}{\\text{n\\_games}}\n\\]\n\nWe fit the classical TWFE model by estimating the following equation via Ordinary Least Squares (OLS): \\[\nY_{it} = \\beta_{0} + \\beta_{1} \\text{is\\_host}_{it} + \\beta_{2}\\text{pre\\_elo\\_rating} + \\gamma_{i} + \\delta_{t} + \\epsilon_{it}\n\\]\n\nEntity fixed effects (\\(\\gamma_i\\)): Implemented via team_id. This absorbs all time-invariant, team-specific unobservables — historical football culture, baseline national infrastructure, long-term geographic advantages, and the like.\nTime fixed effects (\\(\\delta_t\\)): Implemented via year. This absorbs team-invariant, time-specific shocks such as changes in global tournament rules, ball design, tactical trends of a given era, or macro weather conditions.\nThe key estimator (\\(\\beta_1\\)): is_host is the treatment indicator. Because unit and time effects are partialled out, \\(\\beta_1\\) estimates the effect of hosting on goal differential per game, comparing a team to its own non-hosting baseline while controlling for tournament-wide trends and time-varying strength (pre_elo_rating).\n\nPre-tournament Elo rating is a good control precisely because it’s measured before the tournament, avoiding bad-control / mediator problems, where a covariate is itself affected by the treatment. Make sure pre_elo_rating is captured before any home-field advantage or hosting assignment could influence it."
+  },
+  {
+    "objectID": "posts/world-cup-hosting-premium/index.html#team-level-long-dataset",
+    "href": "posts/world-cup-hosting-premium/index.html#team-level-long-dataset",
+    "title": "Does hosting the World cup boost performance?",
+    "section": "Team-level (long) dataset",
+    "text": "Team-level (long) dataset\nFor the hosting-premium analysis, each match needs to become two team-level observations rather than one row with a home and away side. wc_games is reshaped into wc_games_long, with one row per team per match (match_id, year, team, goals_for, goals_against), home row first:"
+  },
+  {
+    "objectID": "posts/world-cup-hosting-premium/index.html#limitations-next-steps",
+    "href": "posts/world-cup-hosting-premium/index.html#limitations-next-steps",
+    "title": "Does hosting the World cup boost performance?",
+    "section": "Limitations & next steps",
+    "text": "Limitations & next steps\n\nSmall treated-group inference. With only 21 host-observations clustered among 82 entities, cluster-robust SEs may be unreliable (few-cluster bias). Worth reporting a wild cluster bootstrap or randomization-inference p-value as a robustness check alongside the asymptotic clustered SE.\nTwo-way clustering / serial correlation check. Standard errors are currently clustered only on team_id. Since hosting years are also correlated across teams within a tournament (e.g., co-hosts, or tournament-specific shocks not fully absorbed by time FE), two-way clustering (entity × year) or at least a robustness check against tournament-clustered SEs would be worth showing.\nRecent TWFE-with-heterogeneous-effects literature. Given repeat “quasi-treatment” isn’t at issue here (hosting is close to one-shot per country), the classic negative-weighting critique (Goodman-Bacon/de Chaisemartin) is less of a concern than for staggered-adoption designs — but it’s worth noting why, or running a Callaway & Sant’Anna-style estimator as a sensitivity check, since some hosts (e.g. co-hosts, repeat hosts) do reappear in the panel."
+  },
+  {
+    "objectID": "about.html",
+    "href": "about.html",
+    "title": "About",
+    "section": "",
+    "text": "About this blog"
+  },
+  {
+    "objectID": "posts/world-cup-data-matches/index.html",
+    "href": "posts/world-cup-data-matches/index.html",
+    "title": "Cleaning the World Cup Matches dataset",
+    "section": "",
+    "text": "This post documents, end to end, how the raw World Cup Matches dataset is cleaned before it’s used in the World Cup hosting premium analysis. Keeping the cleaning steps in their own post makes them traceable and reproducible independent of any downstream analysis, and the resulting cleaned dataset is what gets published to Kaggle."
+  },
+  {
+    "objectID": "posts/world-cup-data-matches/index.html#world-cup-hosts",
+    "href": "posts/world-cup-data-matches/index.html#world-cup-hosts",
+    "title": "Cleaning the World Cup Matches dataset",
+    "section": "World cup hosts",
+    "text": "World cup hosts\nThe host nations for each of the World cups is extracted from Wikipedia\n\n\n\n\n\n\n\n\nyear\nhost_nation\nconfederation\n\n\n\n\n1930\nUruguay\nCONMEBOL\n\n\n1934\nItaly\nUEFA\n\n\n1938\nFrance\nUEFA\n\n\n1950\nBrazil\nCONMEBOL\n\n\n1954\nSwitzerland\nUEFA\n\n\n1958\nSweden\nUEFA\n\n\n1962\nChile\nCONMEBOL\n\n\n1966\nEngland\nUEFA\n\n\n1970\nMexico\nCONCACAF\n\n\n1974\nGermany FR\nUEFA\n\n\n1978\nArgentina\nCONMEBOL\n\n\n1982\nSpain\nUEFA\n\n\n1986\nMexico\nCONCACAF\n\n\n1990\nItaly\nUEFA\n\n\n1994\nUnited States of America\nCONCACAF\n\n\n1998\nFrance\nUEFA\n\n\n2002\nRepublic of Korea\nAFC\n\n\n2002\nJapan\nAFC\n\n\n2006\nGermany\nUEFA\n\n\n2010\nSouth Africa\nCAF\n\n\n2014\nBrazil\nCONMEBOL\n\n\n2018\nRussia\nUEFA\n\n\n2022\nQatar\nAFC\n\n\n2026\nCanada\nCONCACAF\n\n\n2026\nUnited States of America\nCONCACAF\n\n\n2026\nMexico\nCONCACAF"
+  },
+  {
+    "objectID": "posts/world-cup-data-matches/index.html#world-cup-games",
+    "href": "posts/world-cup-data-matches/index.html#world-cup-games",
+    "title": "Cleaning the World Cup Matches dataset",
+    "section": "World cup games",
+    "text": "World cup games\nThe raw data comes from the FIFA World Cup dataset on Kaggle. Specifically the WorldCupMatches.csv dataset.\n\nCleaning steps\n\nManual edits\n\nSome records had the dates recorded as June/July instead of Jun/Jul. These records were manually modified in the .csv file to ease further processing.\nIn the 1982 World Cup the second group stage games were manually changed from 1 … 4 to A … D, so the stage labels are consistent across tournament years and need to be normalized before they can be used.\nManuall deleted extra string in 3 countries Bosnia and Herzegovina\n\n\n\nDeduplication\n\n\nColumn names normalization\nThe raw column names are verbose and inconsistently cased, so they’re mapped to short, snake_case names:\n\n\n\nOriginal name\nNormalized name\n\n\n\n\nYear\nyear\n\n\nDatetime\nmatch_start\n\n\nStage\nstage\n\n\nStadium\nvenue\n\n\nCity\ncity\n\n\nHome Team Name\nhome_team\n\n\nAway Team Name\naway_team\n\n\nHome Team Goals\nhome_ft_goals\n\n\nAway Team Goals\naway_ft_goals\n\n\nWin conditions\nresolution_type\n\n\nAttendance\nattendance\n\n\nHalf-time Home Goals\nhome_ht_goals\n\n\nHalf-time Away Goals\naway_ht_goals\n\n\nReferee\nreferee\n\n\nAssistant 1\nassistant_1\n\n\nAssistant 2\nassistant_2\n\n\nRoundID\nround_id\n\n\nMatchID\nmatch_id\n\n\nHome Team Initials\nhome_initials\n\n\nAway Team Initials\naway_initials\n\n\n\n\n\nType normalization\n\nIntegers\n\n\nDatetime\n\n\nCategorical\n\nStage\n\n\nResolution type\n\n\nHome team and Away team"
+  },
+  {
+    "objectID": "posts/world-cup-data-elo-ratings/index.html",
+    "href": "posts/world-cup-data-elo-ratings/index.html",
+    "title": "Sourcing pre-tournament Elo ratings",
+    "section": "",
+    "text": "Introduction\nThe World Cup hosting premium analysis controls for each team’s strength going into a tournament via pre_elo_rating. That covariate isn’t part of the Kaggle matches dataset, so it’s sourced separately here, in its own post, for the same reason the match-cleaning steps live in their own post: it keeps the scrape traceable and reproducible independent of any downstream analysis.\n\n\n\n\n\n\nNoteData attribution\n\n\n\nAll Elo ratings on this page are sourced from eloratings.net, the World Football Elo Ratings project. All credit for the underlying rating methodology and data collection belongs to that site — this post only documents how the publicly served data is downloaded and reshaped for analysis here.\n\n\n\n\nData source\neloratings.net publishes a “starting” Elo snapshot for every year, e.g. https://eloratings.net/2026_start. The page itself renders client-side (a JS grid) and has no public API, but the grid is populated from two plain TSV files that can be read directly:\n\nhttps://eloratings.net/{year}_start.tsv — one row per team, ranked by rating, with 31 tab-separated columns: rank-change arrow, rank, team code, rating, highest/average/lowest rank and rating, rank/rating changes over the trailing 3 months, 6 months, 1, 2, 5, and 10 years, total matches played (home/away/neutral), wins/losses/draws, and goals for/against.\nhttps://eloratings.net/en.teams.tsv — maps each 2-letter team code to its full country name.\n\n\n\nBuilding the panel\nStarting Elo ratings are pulled for every calendar year from 1930 through 2026 — not just World Cup years — and stacked into a single panel, so downstream posts can look up any team’s rating in any year without re-scraping. Years already present in the output file from a previous run are skipped, so re-running this post only hits eloratings.net for new years.\n\n\nNormalizing country names\n\n\nOutput\nThe combined panel — sourced from eloratings.net — is written out for downstream use by the data-cleaning and hosting-premium posts:\n\n\nVisual check\nAs a sanity check that the scrape actually worked, here’s Elo rating over time for two teams read straight back from the parquet file:"
+  }
+]
